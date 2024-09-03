@@ -91,7 +91,7 @@ const Form = () => {
     setCheckboxSeleccionado(isChecked);
 
     if (isChecked) {
-      const fechaActual = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
+      const fechaActual = new Date().toISOString().split('T')[0]; 
       setFechaSalida(fechaActual);
       setFechaRegreso(fechaActual);
     } 
@@ -119,6 +119,7 @@ const Form = () => {
     const timeDiff = dateRegreso.getTime() - dateSalida.getTime();
     const dayDiff = timeDiff / (1000 * 3600 * 24);
     let montoCalculado = null;
+    console.log(dayDiff);
 
     if (checkboxSeleccionado) {
       if(lugar.Nombre === 'Distrito Central'){
@@ -150,6 +151,7 @@ const Form = () => {
       console.log('Checkbox no seleccionado.');
     }
  
+    ///////////////////////////////////////////////////////////////////////////////
     if (dayDiff <= 30) {
       if(selectedPais.CodigoPais === 'HN'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
@@ -339,23 +341,23 @@ const Form = () => {
                       sx={{ gridColumn: "span 2" }}
                     />
                        
-                    <TextField
+                       <TextField
                       fullWidth
                       variant="filled"
                       type="date"
                       label="Fecha Salida"
-                      onChange={manejarCambioFechaSalida} 
+                      //onBlur={handleBlur}
+                      onChange={handleChange}
                       name="fecha_salida"
-                      value={fechaSalida} 
+                      //value={values.fecha_salida}
                       error={!!touched.fecha_salida && !!errors.fecha_salida}
-                      sx={{ gridColumn: 'span 2' }}
+                      sx={{ gridColumn: "span 2" }}
                       InputLabelProps={{
-                        shrink: true,
+                        shrink: true
                       }}
                       inputProps={{
                         min: today2,
                       }}
-                      disabled={checkboxSeleccionado} 
                     />
 
                     <TextField
@@ -364,19 +366,19 @@ const Form = () => {
                       type="date"
                       label="Fecha de Regreso"
                       min={currentDate}
-                      onChange={manejarCambioFechaRegreso} 
+                      //onBlur={handleBlur}
+                      onChange={handleChange}
                       name="fecha_regreso"
-                      value={fechaRegreso} 
+                      //value={values.fecha_regreso}
                       error={!!touched.fecha_regreso && !!errors.fecha_regreso}
-                      sx={{ gridColumn: 'span 2' }}
+                      sx={{ gridColumn: "span 2" }}
                       InputLabelProps={{
-                        shrink: true,
+                        shrink: true
                       }}
                       inputProps={{
                         min: today2,
                       }}
-                      disabled={checkboxSeleccionado} // Deshabilitar si el checkbox está seleccionado
-                    />
+                    />  
 
                     <TextField
                       fullWidth
