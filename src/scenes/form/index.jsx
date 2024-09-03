@@ -27,7 +27,6 @@ const Form = () => {
   const [Monto, setMonto] = useState('');
   const [fechaSalida, setFechaSalida] = useState('');
   const [fechaRegreso, setFechaRegreso] = useState('');
-  const [pais, setPais] = useState(null);
 
   const today = new Date();
   const month = today.getMonth()+1;
@@ -80,10 +79,6 @@ const Form = () => {
 
   const handleLugar = (lugar) => {
     setLugar(lugar);
-  };
-
-  const handlePais = (pais) => {
-    setPais(pais);
   };
 
   const manejarCambioCheckbox = (e) => {
@@ -162,8 +157,7 @@ const Form = () => {
         };
         montoCalculado = await GetMontoViaticoLempiras(MontoViatico);
       }else{
-        console.log(pais);
-        const codigoZonaViatico = await GetCodigoZonaViatico(pais)
+        const codigoZonaViatico = await GetCodigoZonaViatico(selectedPais.NombrePais)
         const MontoViatico = {
           CodigoZona: codigoZonaViatico,
           CodigoCargoEmpleado: tipoEmpleado,
@@ -182,7 +176,7 @@ const Form = () => {
         };
         montoCalculado = await GetMontoViaticoLempiras(MontoViatico);
       }else{
-        const codigoZonaViatico = await GetCodigoZonaViatico(pais)
+        const codigoZonaViatico = await GetCodigoZonaViatico(selectedPais.NombrePais)
         const MontoViatico = {
           CodigoZona: codigoZonaViatico,
           CodigoCargoEmpleado: tipoEmpleado,
@@ -216,7 +210,7 @@ const Form = () => {
 
     const newDetailForm2 = {
       NumeroAutorizacionAnticipo: anticipo,
-      LugarAVisitar: (lugar.IDMunicipio) ? lugar.IDMunicipio : pais,
+      LugarAVisitar: (lugar.IDMunicipio) ? lugar.IDMunicipio : selectedPais.NombrePais,
       ObjetivoMision: values.objetivo_mision,
       Observaciones: values.observaciones,
       FechaSalida: values.fecha_salida,
@@ -322,7 +316,6 @@ const Form = () => {
                         onCountryChange={handleCountryChange}
                         onLugar={handleLugar}
                         getMoneda={handleMoneda}
-                        onPais={handlePais}
                       />
                     </Box>
                     

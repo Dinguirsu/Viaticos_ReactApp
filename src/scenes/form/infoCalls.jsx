@@ -96,7 +96,7 @@ export const TipoEmpleadoComponent = ({onTipoEmpleado}) => {
   );
 };
 
-export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, onPais}) => {
+export const SelectContinentes = ({onCountryChange, onLugar, getMoneda}) => {
   const [continentes, setContinentes] = useState([]);
   const [selectedPais, setSelectedPais] = useState(null);
   const [isPaisDisabled, setIsPaisDisabled] = useState(true);
@@ -148,14 +148,13 @@ export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, onPais})
           onLugar={onLugar}
           disabled={isPaisDisabled}
           getMoneda={getMoneda}
-          onPais={onPais}
         />
       )}      
   </div>
   );
 };
 
-export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar, getMoneda, onPais }) => {
+export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar, getMoneda}) => {
   const [paises, setPaises] = useState([]);
   const [selectedPais, setSelectedPais] = useState(null);
   const [isDeptoDisabled, setIsDeptoDisabled] = useState(true);
@@ -178,7 +177,6 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
   const handleChange = (event, newValue) => {
     setSelectedPais(newValue);
     onCountryChange(newValue);
-    onPais(newValue.NombrePais);
     if (newValue && newValue.CodigoPais === 'HN') {
       setIsDeptoDisabled(false);
       getMoneda("1")
