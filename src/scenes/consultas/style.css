@@ -1,0 +1,38 @@
+    .Consultas {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    }
+  
+  .header, .footer {
+    background-color: #2E3B55;
+    color: white;
+    padding: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 20px 0;
+  }
+  
+  .section {
+    margin: 10px 0;
+  }
+  
+  .button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    background-color: #ddd;
+  }
+  
