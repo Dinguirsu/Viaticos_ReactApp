@@ -166,7 +166,6 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
         try {
           const response = await axios.get(`http://localhost:3000/api/pais/${continente.CodigoContinente}`);
           setPaises(response.data);
-          onPais(paises);
         } catch (error) {
           console.error('Error fetching the countries:', error);
         }
@@ -179,6 +178,7 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
   const handleChange = (event, newValue) => {
     setSelectedPais(newValue);
     onCountryChange(newValue);
+    onPais(newValue.NombrePais);
     if (newValue && newValue.CodigoPais === 'HN') {
       setIsDeptoDisabled(false);
       getMoneda("1")
@@ -512,9 +512,9 @@ export const GetCodigoZonaViaticoHN = async (NombreMunicipio) => {
 
 export const GetCodigoZonaViatico = async (NombrePais) => {
   try {
-    console.log(NombrePais);
     const response = await axios.get(`http://localhost:3000/api/obtenerCodigoZonaViatico/${NombrePais}`);
-    return response.data[0].CodigoZonaViaticos; // Valor por defecto si es undefined
+    console.log(response.data[0].CodigoZona);
+    return response.data[0].CodigoZona; // Valor por defecto si es undefined
   } catch (error) {
     console.error('Error fetching Codigo:', error);
   }
@@ -533,10 +533,11 @@ export const GetMontoViaticoLempiras = async (data) => {
 
 export const GetMontoViaticoDolares = async (data) => {
   try {
+    console.log(data);
     const response = await axios.get('http://localhost:3000/api/obtenerMontoViaticoDolares', {
       params: data
     });
-    return response.data
+    return response.data[0].Monto
   } catch (error) {
     console.error('Error fetching divisa:', error);
   }

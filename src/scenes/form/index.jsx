@@ -216,7 +216,7 @@ const Form = () => {
 
     const newDetailForm2 = {
       NumeroAutorizacionAnticipo: anticipo,
-      LugarAVisitar: lugar.IDMunicipio,
+      LugarAVisitar: (lugar.IDMunicipio) ? lugar.IDMunicipio : pais,
       ObjetivoMision: values.objetivo_mision,
       Observaciones: values.observaciones,
       FechaSalida: values.fecha_salida,
@@ -341,7 +341,7 @@ const Form = () => {
                       sx={{ gridColumn: "span 2" }}
                     />
                        
-                       <TextField
+                    <TextField
                       fullWidth
                       variant="filled"
                       type="date"
