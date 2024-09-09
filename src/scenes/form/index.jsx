@@ -27,6 +27,7 @@ const Form = () => {
   const [Monto, setMonto] = useState('');
   const [fechaSalida, setFechaSalida] = useState('');
   const [fechaRegreso, setFechaRegreso] = useState('');
+  const [reset, setReset] = useState(false);
 
   const today = new Date();
   const month = today.getMonth()+1;
@@ -81,7 +82,7 @@ const Form = () => {
     setLugar(lugar);
   };
 
-  const manejarCambioCheckbox = (e) => {
+  const manejarCambioCheckbox = (e, setFieldValue) => {
     const isChecked = e.target.checked;
     setCheckboxSeleccionado(isChecked);
 
@@ -89,34 +90,23 @@ const Form = () => {
       const fechaActual = new Date().toISOString().split('T')[0]; 
       setFechaSalida(fechaActual);
       setFechaRegreso(fechaActual);
+      setFieldValue('fecha_salida', fechaActual);
+      setFieldValue('fecha_regreso', fechaActual);
     } 
-  };
-
-  const manejarCambioFechaSalida = (e) => {
-    if (!checkboxSeleccionado) {
-      setFechaSalida(e.target.value);
-    }
-  };
-
-  const manejarCambioFechaRegreso = (e) => {
-    if (!checkboxSeleccionado) {
-      setFechaRegreso(e.target.value);
-    }
   };
 
   const [checkboxSeleccionado, setCheckboxSeleccionado] = useState(false);
 
   const handleSubmit = async (values, { resetForm }) => {
 
-    const dateSalida = new Date(values.fecha_salida);
-    const dateRegreso = new Date(values.fecha_regreso);
-
-    const timeDiff = dateRegreso.getTime() - dateSalida.getTime();
-    const dayDiff = timeDiff / (1000 * 3600 * 24);
+    let dateSalida = new Date();
+    let dateRegreso = new Date();
     let montoCalculado = null;
-    console.log(dayDiff);
 
     if (checkboxSeleccionado) {
+      console.log("Aqui si deberia entrar");
+      dateSalida = new Date(currentDate);
+      dateRegreso = new Date(currentDate);     
       if(lugar.Nombre === 'Distrito Central'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
         const MontoViatico = {
@@ -125,9 +115,9 @@ const Form = () => {
           CodigoPeriodo: 1         
         };
         let monto = await GetMontoViaticoLempiras(MontoViatico);
-        montoCalculado = monto * 0.25;
         console.log(monto);
-        console.log('DC',montoCalculado);
+        montoCalculado = monto * 0.25;
+        console.log(montoCalculado);
       }
       else{
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
@@ -137,17 +127,23 @@ const Form = () => {
           CodigoPeriodo: 1         
         };
         let monto = await GetMontoViaticoLempiras(MontoViatico);
-        montoCalculado = monto * 0.50;
         console.log(monto);
-        console.log('FDC', montoCalculado);
+        montoCalculado = monto * 0.50;
       }
       
     } else {
       console.log('Checkbox no seleccionado.');
+      dateSalida = new Date(values.fecha_salida);
+      dateRegreso = new Date(values.fecha_regreso);
     }
+
+    
+    const timeDiff = dateRegreso.getTime() - dateSalida.getTime();
+    const dayDiff = timeDiff / (1000 * 3600 * 24);
  
     ///////////////////////////////////////////////////////////////////////////////
-    if (dayDiff <= 30) {
+    if (dayDiff <= 30 && !checkboxSeleccionado) {
+      console.log("En teoria no deberia entrar aqui");
       if(selectedPais.CodigoPais === 'HN'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
         const MontoViatico = {
@@ -166,7 +162,7 @@ const Form = () => {
         montoCalculado = await GetMontoViaticoDolares(MontoViatico);
       }
       console.log("Menos de 30 dias");
-    } else {
+    } else if(!checkboxSeleccionado){
       if(selectedPais.CodigoPais === 'HN'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
         const MontoViatico = {
@@ -213,8 +209,8 @@ const Form = () => {
       LugarAVisitar: (lugar.IDMunicipio) ? lugar.IDMunicipio : selectedPais.NombrePais,
       ObjetivoMision: values.objetivo_mision,
       Observaciones: values.observaciones,
-      FechaSalida: values.fecha_salida,
-      FechaRegreso: values.fecha_regreso,
+      FechaSalida: (checkboxSeleccionado) ? fechaSalida : values.fecha_salida,
+      FechaRegreso: (checkboxSeleccionado) ? fechaRegreso : values.fecha_regreso,
       IDTransporte: transport.IDTransporte,
       NumeroPlaca: registro,
       TipoCambio: cambio,
@@ -229,6 +225,9 @@ const Form = () => {
     console.log('Resultado:', newDetailForm2);
     setDetails([...details, newDetail]);
     resetForm();
+    setReset(true); // Activar el reset
+    setTimeout(() => setReset(false), 0);
+    setCheckboxSeleccionado(false);
   };
 
   const theme = useTheme();
@@ -257,21 +256,25 @@ const Form = () => {
           handleBlur,
           handleChange,
           handleSubmit,
+          setFieldValue,
         }) => (          
           <Grid container spacing={2}>           
             <Header title="Sistemas de Control de Viaticos"/>
             <Grid item xs={12} md={6}>
             <form onSubmit={handleSubmit}>
             <GetTotalAnticipos onGetDatos={handleAnticipo} onGetEstado={handleEstado}/>
+
             <label className="checkbox-container">
               Viatico por un dia
               <input
                 type="checkbox"
                 checked={checkboxSeleccionado}
-                onChange={manejarCambioCheckbox}
+                onChange={(e) => manejarCambioCheckbox(e, setFieldValue)}
+                color="primary"
               />
               <span className="checkmark"></span>
             </label>
+
               <Header subtitle="Datos Generales" />              
                 <Box>
                   <Box
@@ -316,6 +319,7 @@ const Form = () => {
                         onCountryChange={handleCountryChange}
                         onLugar={handleLugar}
                         getMoneda={handleMoneda}
+                        reset={reset}
                       />
                     </Box>
                     
@@ -342,7 +346,7 @@ const Form = () => {
                       //onBlur={handleBlur}
                       onChange={handleChange}
                       name="fecha_salida"
-                      //value={values.fecha_salida}
+                      value={(checkboxSeleccionado) ? fechaSalida : values.fecha_salida}
                       error={!!touched.fecha_salida && !!errors.fecha_salida}
                       sx={{ gridColumn: "span 2" }}
                       InputLabelProps={{
@@ -351,6 +355,7 @@ const Form = () => {
                       inputProps={{
                         min: today2,
                       }}
+                      disabled={checkboxSeleccionado}
                     />
 
                     <TextField
@@ -362,7 +367,7 @@ const Form = () => {
                       //onBlur={handleBlur}
                       onChange={handleChange}
                       name="fecha_regreso"
-                      //value={values.fecha_regreso}
+                      value={(checkboxSeleccionado) ? fechaRegreso : values.fecha_regreso}
                       error={!!touched.fecha_regreso && !!errors.fecha_regreso}
                       sx={{ gridColumn: "span 2" }}
                       InputLabelProps={{
@@ -371,6 +376,7 @@ const Form = () => {
                       inputProps={{
                         min: today2,
                       }}
+                      disabled={checkboxSeleccionado}
                     />  
 
                     <TextField
@@ -453,10 +459,10 @@ const checkoutSchema = yup.object().shape({
   //fecha_ingreso: yup.string().required("required"),
   //continente: yup.string().required("required"),
   //pais_destino: yup.string().required("required"),
-  //objetivo_mision: yup.string().required("required"),
-  //observaciones: yup.string().required("required"),
-  //fecha_salida: yup.string().required("required"),
-  //fecha_regreso: yup.string().required("required"),
+  objetivo_mision: yup.string().required("required"),
+  observaciones: yup.string().required("required"),
+  fecha_salida: yup.string().required("required"),
+  fecha_regreso: yup.string().required("required"),
   //placa_automovil: yup.string().required("required")
 });
 

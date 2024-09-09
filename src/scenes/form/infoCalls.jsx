@@ -96,7 +96,7 @@ export const TipoEmpleadoComponent = ({onTipoEmpleado}) => {
   );
 };
 
-export const SelectContinentes = ({onCountryChange, onLugar, getMoneda}) => {
+export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, reset}) => {
   const [continentes, setContinentes] = useState([]);
   const [selectedPais, setSelectedPais] = useState(null);
   const [isPaisDisabled, setIsPaisDisabled] = useState(true);
@@ -125,6 +125,13 @@ export const SelectContinentes = ({onCountryChange, onLugar, getMoneda}) => {
     fetchContinente();
   }, []);
 
+  useEffect(() => {
+    if (reset) {
+      setSelectedContinente(null);
+      setIsPaisDisabled(true);
+    }
+  }, [reset]);
+
   return (
     <div>
       <Autocomplete
@@ -148,13 +155,14 @@ export const SelectContinentes = ({onCountryChange, onLugar, getMoneda}) => {
           onLugar={onLugar}
           disabled={isPaisDisabled}
           getMoneda={getMoneda}
+          reset={reset}
         />
       )}      
   </div>
   );
 };
 
-export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar, getMoneda}) => {
+export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar, getMoneda, reset}) => {
   const [paises, setPaises] = useState([]);
   const [selectedPais, setSelectedPais] = useState(null);
   const [isDeptoDisabled, setIsDeptoDisabled] = useState(true);
@@ -173,6 +181,13 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
 
     fetchPaises();
   }, []);
+
+  useEffect(() => {
+    if (reset) {
+      setSelectedPais(null);
+      setIsDeptoDisabled(true);
+    }
+  }, [reset]);
 
   const handleChange = (event, newValue) => {
     setSelectedPais(newValue);
@@ -212,6 +227,7 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
             disabled={isDeptoDisabled} 
             pais={selectedPais}
             onLugar={onLugar}
+            reset={reset}
           />
         </Box>
       )}
@@ -219,7 +235,7 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
   );
 };
 
-export const DeptoSelector = ({ pais, disabled, onLugar}) => {
+export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
   const [departamento, setDepartamento] = useState([]);
   const [selectdepto, setSelectedDepto] = useState(null);
   const [isMuniDisabled, setIsMuniDisabled] = useState(true);
@@ -237,6 +253,14 @@ export const DeptoSelector = ({ pais, disabled, onLugar}) => {
 
     fetchPaises();
   }, []);
+
+  useEffect(() => {
+    if (reset) {
+      setSelectedDepto(null);
+      setIsMuniDisabled(true);
+    }
+  }, [reset]);
+
   const handleChange = (event, newValue) => {
     setSelectedDepto(newValue);
     if (newValue) {
@@ -270,13 +294,14 @@ export const DeptoSelector = ({ pais, disabled, onLugar}) => {
         <MuniSelector 
           depto={selectdepto} 
           onLugar={onLugar}
+          reset={reset}
         />
       )}
     </div>
   );
 };
 
-export const MuniSelector = ({ depto, disabled, onLugar }) => {
+export const MuniSelector = ({ depto, disabled, onLugar, reset }) => {
   const [municipio, setMunicipio] = useState([]);
   const [SelectedMuni, setSelectedMuni] = useState(null);
 
@@ -297,6 +322,12 @@ export const MuniSelector = ({ depto, disabled, onLugar }) => {
 
     fetchMunicipio();
   }, []);
+
+  useEffect(() => {
+    if (reset) {
+      setSelectedMuni(null);
+    }
+  }, [reset]);
 
   const handleChange = (event, newValue) => {
     setSelectedMuni(newValue);
