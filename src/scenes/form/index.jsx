@@ -276,9 +276,9 @@ const Form = () => {
         
             <><Header title="Sistemas de Control de Viaticos" /><form onSubmit={handleSubmit}>
               <GetTotalAnticipos onGetDatos={handleAnticipo} onGetEstado={handleEstado} />
-
+              <br></br>
               <label className="checkbox-container">
-                Viatico por un dia
+                VIATICO POR UN PAR DE HORAS
                 <input
                   type="checkbox"
                   checked={checkboxSeleccionado}

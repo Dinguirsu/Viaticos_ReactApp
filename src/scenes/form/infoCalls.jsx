@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TextField, Typography, Box } from "@mui/material";
 import Autocomplete from '@mui/material/Autocomplete';
+import { red } from '@mui/material/colors';
 
 export const NombreEmpleadoComponent = ({onEmpleadoChange}) => {
   const [Empleado, setNombreEmpleado] = useState('');
@@ -20,17 +21,7 @@ export const NombreEmpleadoComponent = ({onEmpleadoChange}) => {
 
     fetchNombreEmpleado();
   }, []);
-  return (
-    <TextField
-      fullWidth
-      variant="filled"
-      type="text"
-      label="Nombre"
-      value={Empleado}
-      name="nombre"     
-      sx={{ gridColumn: "span 2" }}
-    />
-  );
+  return ([]);
 };
 
 export const AreaEmpleadoComponent = ({onAreaChange}) => {
@@ -50,17 +41,7 @@ export const AreaEmpleadoComponent = ({onAreaChange}) => {
   
       fetchAreaEmpleado();
     }, []);
-    return (
-      <TextField
-        fullWidth
-        variant="filled"
-        type="text"
-        label="Area Solicitada"
-        value={Area}
-        name="area"
-        sx={{ gridColumn: "span 2" }}
-      />
-    );
+    return ([]);
   };
 
 export const TipoEmpleadoComponent = ({onTipoEmpleado}) => {
@@ -82,6 +63,7 @@ export const TipoEmpleadoComponent = ({onTipoEmpleado}) => {
   }, []);
   return (
       <TextField
+        hidden
         fullWidth
         variant="filled"
         type="text"
@@ -146,6 +128,26 @@ export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, reset}) 
           type="text"
           label="Seleccione un Continente"
           name="continente"
+          sx={{
+            '& .MuiInputBase-input': {
+              color: 'white', // Cambia este color al que prefieras
+            },
+            '& .MuiFormLabel-root': {
+              color: 'white', // Cambia el color del label cuando no está enfocado
+            },
+            '& .MuiFormLabel-root.Mui-focused': {
+              color: 'white', // Cambia el color del label cuando está enfocado
+            },
+            '& .MuiInput-underline:before': {
+              borderBottomColor: 'white', // Color de la línea antes de enfocarse
+            },
+            '& .MuiInput-underline:hover:before': {
+              borderBottomColor: 'white', // Color de la línea al pasar el cursor
+            },
+            '& .MuiInput-underline:after': {
+              borderBottomColor: 'white', // Color de la línea después de enfocarse
+            },
+          }}
         />}
       />
       {selectedContinente &&(    
@@ -205,6 +207,7 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
 
   return (
     <div>
+      <br></br>
       <Autocomplete
         disabled = {disabled}
         onChange={handleChange}
@@ -218,6 +221,26 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
               type="text"
               label="Seleccione un País"
               name="pais_destino"
+              sx={{
+                '& .MuiInputBase-input': {
+                  color: 'white', // Cambia este color al que prefieras
+                },
+                '& .MuiFormLabel-root': {
+                  color: 'white', // Cambia el color del label cuando no está enfocado
+                },
+                '& .MuiFormLabel-root.Mui-focused': {
+                  color: 'white', // Cambia el color del label cuando está enfocado
+                },
+                '& .MuiInput-underline:before': {
+                  borderBottomColor: 'white', // Color de la línea antes de enfocarse
+                },
+                '& .MuiInput-underline:hover:before': {
+                  borderBottomColor: 'white', // Color de la línea al pasar el cursor
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottomColor: 'white', // Color de la línea después de enfocarse
+                },
+              }}
           />
         }
       />
@@ -273,6 +296,7 @@ export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
 
   return (
     <div>
+      <br></br>
       <Autocomplete
         disabled = {disabled}
         onChange={handleChange}
@@ -286,7 +310,26 @@ export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
               type="text"
               label="Seleccione un Departamento"
               name="departamento"
-              sx={{ gridColumn: "span 2" }}
+              sx={{ gridColumn: "span 2",
+                '& .MuiInputBase-input': {
+                  color: 'white', // Cambia este color al que prefieras
+                },
+                '& .MuiFormLabel-root': {
+                  color: 'white', // Cambia el color del label cuando no está enfocado
+                },
+                '& .MuiFormLabel-root.Mui-focused': {
+                  color: 'white', // Cambia el color del label cuando está enfocado
+                },
+                '& .MuiInput-underline:before': {
+                  borderBottomColor: 'white', // Color de la línea antes de enfocarse
+                },
+                '& .MuiInput-underline:hover:before': {
+                  borderBottomColor: 'white', // Color de la línea al pasar el cursor
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottomColor: 'white', // Color de la línea después de enfocarse
+                },
+               }}
           />
         }
       />
@@ -338,23 +381,45 @@ export const MuniSelector = ({ depto, disabled, onLugar, reset }) => {
   };
 
   return (
-    <Autocomplete
-      onChange={handleChange}
-      disabled = {disabled}
-      options={municipio}
-      getOptionLabel={(option) => option.Nombre}
-      renderInput={(params) =>         
-        <TextField
-            {...params}
-            fullWidth
-            variant="filled"
-            type="text"
-            label="Seleccione un Municipio"
-            name="municipio"
-            sx={{ gridColumn: "span 2" }}
-        />
-      }
-    />
+    <div>
+      <br></br>
+      <Autocomplete
+        onChange={handleChange}
+        disabled = {disabled}
+        options={municipio}
+        getOptionLabel={(option) => option.Nombre}
+        renderInput={(params) =>         
+          <TextField
+              {...params}
+              fullWidth
+              variant="filled"
+              type="text"
+              label="Seleccione un Municipio"
+              name="municipio"
+              sx={{ gridColumn: "span 2" ,
+                '& .MuiInputBase-input': {
+                  color: 'white', // Cambia este color al que prefieras
+                },
+                '& .MuiFormLabel-root': {
+                  color: 'white', // Cambia el color del label cuando no está enfocado
+                },
+                '& .MuiFormLabel-root.Mui-focused': {
+                  color: 'white', // Cambia el color del label cuando está enfocado
+                },
+                '& .MuiInput-underline:before': {
+                  borderBottomColor: 'white', // Color de la línea antes de enfocarse
+                },
+                '& .MuiInput-underline:hover:before': {
+                  borderBottomColor: 'white', // Color de la línea al pasar el cursor
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottomColor: 'white', // Color de la línea después de enfocarse
+                },
+              }}
+          />
+        }
+      />
+    </div>
   );
 };
 
@@ -477,7 +542,7 @@ export const GetTotalAnticipos = ({onGetDatos, onGetEstado}) => {
   }, []);
 
   return (
-    <Box>
+    <Box gridTemplateColumns="repeat(4, minmax(0, 1fr))" sx={{ width: '13%', gridColumn: "span 2" }}>
       <Typography variant="body1">Autorizacion de Anticipo No. :</Typography>
         <Typography variant="subtitle1" sx={{ bgcolor: '#333', padding: '8px', borderRadius: '4px' }}>
           {Anticipos + 1}
