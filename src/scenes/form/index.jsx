@@ -9,6 +9,11 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '.././../theme';
 import { NombreEmpleadoComponent, AreaEmpleadoComponent, TipoEmpleadoComponent, SelectContinentes, TransporteComponent, GetTotalAnticipos, TipoCambioComponent, postAnticiposDetalleMision, postAnticiposGastoViaje, GetCodigoZonaViatico, GetCodigoZonaViaticoHN, GetMontoViaticoDolares, GetMontoViaticoLempiras} from "./infoCalls";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import './index.css';
 
 const Form = () => {  
@@ -28,6 +33,8 @@ const Form = () => {
   const [fechaSalida, setFechaSalida] = useState('');
   const [fechaRegreso, setFechaRegreso] = useState('');
   const [reset, setReset] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [formData, setFormData] = useState([]);
 
   const today = new Date();
   const month = today.getMonth()+1;
@@ -187,7 +194,7 @@ const Form = () => {
       id: details.length + 1,
       nombre: empleado.Empleado,
       area: area,
-      pais_destino: selectedPais.NombrePais,
+      pais_destino: (lugar.Nombre) ? lugar.Nombre : selectedPais.NombrePais,
       objetivo_mision: values.objetivo_mision,
       fecha_salida: values.fecha_salida,
       fecha_regreso: values.fecha_regreso,
@@ -219,7 +226,8 @@ const Form = () => {
       SistemaUsuario: empleado.Empleado,
       SistemaFecha: currentDate
     };
-
+    setFormData(newDetail);
+    setOpenDialog(true);
     //const result = await postAnticiposGastoViaje(newDetailForm);
     //const result2 = await postAnticiposDetalleMision(newDetailForm2);
     console.log('Resultado:', newDetailForm2);
@@ -241,6 +249,13 @@ const Form = () => {
     { field: 'fecha_salida', headerName: 'Fecha Salida', flex: 1 },
     { field: 'fecha_regreso', headerName: 'Fecha Regreso', flex: 1 },
   ];
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleAddNew = () => {
+    window.location.reload(); // Refrescar la página
+  };
 
     return (
       <Box m="20px"> 
@@ -258,196 +273,170 @@ const Form = () => {
           handleSubmit,
           setFieldValue,
         }) => (          
-          <Grid container spacing={2}>           
-            <Header title="Sistemas de Control de Viaticos"/>
-            <Grid item xs={12} md={6}>
-            <form onSubmit={handleSubmit}>
-            <GetTotalAnticipos onGetDatos={handleAnticipo} onGetEstado={handleEstado}/>
+        
+            <><Header title="Sistemas de Control de Viaticos" /><form onSubmit={handleSubmit}>
+              <GetTotalAnticipos onGetDatos={handleAnticipo} onGetEstado={handleEstado} />
 
-            <label className="checkbox-container">
-              Viatico por un dia
-              <input
-                type="checkbox"
-                checked={checkboxSeleccionado}
-                onChange={(e) => manejarCambioCheckbox(e, setFieldValue)}
-                color="primary"
-              />
-              <span className="checkmark"></span>
-            </label>
+              <label className="checkbox-container">
+                Viatico por un dia
+                <input
+                  type="checkbox"
+                  checked={checkboxSeleccionado}
+                  onChange={(e) => manejarCambioCheckbox(e, setFieldValue)}
+                  color="primary" />
+                <span className="checkmark"></span>
+              </label>
 
-              <Header subtitle="Datos Generales" />              
-                <Box>
-                  <Box
-                    display="grid"
-                    gap="40px"
-                    gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                    sx={{
-                      width: '100%',
-                      "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                    }}
-                  > 
-                    <NombreEmpleadoComponent onEmpleadoChange={handleEmpleadoChange}/>                
+              <Header subtitle="Datos Generales" />
+              <Box>
+                <Box
+                  display="grid"
+                  gap="40px"
+                  gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                  sx={{
+                    width: '100%',
+                    "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                  }}
+                >
+                  <NombreEmpleadoComponent onEmpleadoChange={handleEmpleadoChange} />
 
-                    <AreaEmpleadoComponent onAreaChange={handleAreaChange}/>
-                    
-                    <TipoEmpleadoComponent onTipoEmpleado={handleTipoEmpleado} />
+                  <AreaEmpleadoComponent onAreaChange={handleAreaChange} />
 
-                    <TextField
-                      fullWidth
-                      variant="filled"
-                      type="text"
-                      label="Fecha Ingreso"
-                      //onBlur={handleBlur}
-                      //onChange={handleChange}
-                      value={currentDate}
-                      name="fecha_ingreso"
-                      sx={{ gridColumn: "span 2" }}
-                    />                                         
-                  </Box>
-                  <Header subtitle="Datos de la Mision" />
-                  <Box
-                    display="grid"
-                    gap="30px"
-                    gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                    sx={{
-                      width: '100%',
-                      "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                    }}
-                  >
-                    <Box gridTemplateColumns="repeat(4, minmax(0, 1fr))" sx={{ width: '100%', gridColumn: "span 2"}}>
-                      <SelectContinentes
-                        onCountryChange={handleCountryChange}
-                        onLugar={handleLugar}
-                        getMoneda={handleMoneda}
-                        reset={reset}
-                      />
-                    </Box>
-                    
-                    <TipoCambioComponent getCambio={handleCambio}/>
+                  <TipoEmpleadoComponent onTipoEmpleado={handleTipoEmpleado} />
 
-                    <TextField
-                      fullWidth
-                      variant="filled"
-                      type="text"
-                      label="Objetivo de la Mision"
-                      //onBlur={handleBlur}
-                      onChange={handleChange}
-                      //value={values.objetivo_mision}
-                      name="objetivo_mision"
-                      error={!!touched.objetivo_mision && !!errors.objetivo_mision}
-                      sx={{ gridColumn: "span 2" }}
-                    />
-                       
-                    <TextField
-                      fullWidth
-                      variant="filled"
-                      type="date"
-                      label="Fecha Salida"
-                      //onBlur={handleBlur}
-                      onChange={handleChange}
-                      name="fecha_salida"
-                      value={(checkboxSeleccionado) ? fechaSalida : values.fecha_salida}
-                      error={!!touched.fecha_salida && !!errors.fecha_salida}
-                      sx={{ gridColumn: "span 2" }}
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      inputProps={{
-                        min: today2,
-                      }}
-                      disabled={checkboxSeleccionado}
-                    />
-
-                    <TextField
-                      fullWidth
-                      variant="filled"
-                      type="date"
-                      label="Fecha de Regreso"
-                      min={currentDate}
-                      //onBlur={handleBlur}
-                      onChange={handleChange}
-                      name="fecha_regreso"
-                      value={(checkboxSeleccionado) ? fechaRegreso : values.fecha_regreso}
-                      error={!!touched.fecha_regreso && !!errors.fecha_regreso}
-                      sx={{ gridColumn: "span 2" }}
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      inputProps={{
-                        min: today2,
-                      }}
-                      disabled={checkboxSeleccionado}
-                    />  
-
-                    <TextField
-                      fullWidth
-                      variant="filled"
-                      type="text"
-                      label="Observaciones"
-                      //onBlur={handleBlur}
-                      onChange={handleChange}
-                      name="observaciones"
-                      //value={values.observaciones}
-                      error={!!touched.observaciones && !!errors.observaciones}
-                      sx={{ gridColumn: "span 2" }}
-                    />
-
-                    <Box gridTemplateColumns="repeat(4, minmax(0, 1fr))" sx={{ width: '100%', gridColumn: "span 2"}}>
-                      <TransporteComponent 
-                        onSelectTransport={handleTransport} 
-                        onSelectRegitro={handleRegistro}
-                      />
-                    </Box>
-
-                  </Box>
-                  <Box display="flex" justifyContent="start" mt="20px">
-                    <Button type="submit" color="primary" variant="contained">
-                      Agregar Nuevo Detalle
-                    </Button>
-                  </Box>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Fecha Ingreso"
+                    //onBlur={handleBlur}
+                    //onChange={handleChange}
+                    value={currentDate}
+                    name="fecha_ingreso"
+                    sx={{ gridColumn: "span 2" }} />
                 </Box>
-              </form>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Header subtitle="Datos de la Mision" />
-              <Box
-                m="10px 0 0 0"
-                height="45vh"
-                sx={{
-                  "& .MuiDataGrid-root": {
-                    border: "none",
-                  },
-                  "& .MuiDataGrid-cell": {
-                    borderBottom: "none",
-                  },
-                  "& .MuiDataGrid-columnHeaders": {
-                    backgroundColor: colors.blueAccent[700],
-                    borderBottom: "none",
-                  },
-                  "& .MuiDataGrid-virtualScroller": {
-                    backgroundColor: colors.primary[400],
-                  },
-                  "& .MuiDataGrid-footerContainer": {
-                    borderTop: "none",
-                    backgroundColor: colors.blueAccent[700],
-                  },
-                  "& .MuiCheckbox-root": {
-                    color: `${colors.greenAccent[200]} !important`,
-                  },
-                  "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                    color: `${colors.grey[100]} !important`,
-                  },
-                }}
-              >
-                <DataGrid
-                  rows={details}
-                  columns={columns}
-                  components={{ Toolbar: GridToolbar }}
-                />
+                <Header subtitle="Datos de la Mision" />
+                <Box
+                  display="grid"
+                  gap="30px"
+                  gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                  sx={{
+                    width: '100%',
+                    "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                  }}
+                >
+                  <Box gridTemplateColumns="repeat(4, minmax(0, 1fr))" sx={{ width: '100%', gridColumn: "span 2" }}>
+                    <SelectContinentes
+                      onCountryChange={handleCountryChange}
+                      onLugar={handleLugar}
+                      getMoneda={handleMoneda}
+                      reset={reset} />
+                  </Box>
+
+                  <TipoCambioComponent getCambio={handleCambio} />
+
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Objetivo de la Mision"
+                    //onBlur={handleBlur}
+                    onChange={handleChange}
+                    //value={values.objetivo_mision}
+                    name="objetivo_mision"
+                    error={!!touched.objetivo_mision && !!errors.objetivo_mision}
+                    sx={{ gridColumn: "span 2" }} />
+
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="date"
+                    label="Fecha Salida"
+                    //onBlur={handleBlur}
+                    onChange={handleChange}
+                    name="fecha_salida"
+                    value={(checkboxSeleccionado) ? fechaSalida : values.fecha_salida}
+                    error={!!touched.fecha_salida && !!errors.fecha_salida}
+                    sx={{ gridColumn: "span 2" }}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    inputProps={{
+                      min: today2,
+                    }}
+                    disabled={checkboxSeleccionado} />
+
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="date"
+                    label="Fecha de Regreso"
+                    min={currentDate}
+                    //onBlur={handleBlur}
+                    onChange={handleChange}
+                    name="fecha_regreso"
+                    value={(checkboxSeleccionado) ? fechaRegreso : values.fecha_regreso}
+                    error={!!touched.fecha_regreso && !!errors.fecha_regreso}
+                    sx={{ gridColumn: "span 2" }}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    inputProps={{
+                      min: today2,
+                    }}
+                    disabled={checkboxSeleccionado} />
+
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Observaciones"
+                    //onBlur={handleBlur}
+                    onChange={handleChange}
+                    name="observaciones"
+                    //value={values.observaciones}
+                    error={!!touched.observaciones && !!errors.observaciones}
+                    sx={{ gridColumn: "span 2" }} />
+
+                  <Box gridTemplateColumns="repeat(4, minmax(0, 1fr))" sx={{ width: '100%', gridColumn: "span 2" }}>
+                    <TransporteComponent
+                      onSelectTransport={handleTransport}
+                      onSelectRegitro={handleRegistro} />
+                  </Box>
+
+                </Box>
+                <Box display="flex" justifyContent="start" mt="20px">
+                  <Button type="submit" color="primary" variant="contained">
+                    Agregar Nuevo Detalle
+                  </Button>
+                </Box>
               </Box>
-            </Grid>
-          </Grid>)}
+            </form></>
+            
+)}
         </Formik>
+
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+        >
+        <DialogTitle>Resumen de la Misión</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <strong>Nombre:</strong> {formData.nombre}<br />
+            <strong>Área:</strong> {formData.area}<br />
+            <strong>Lugar de Destino:</strong> {formData.pais_destino}<br />
+            <strong>Objetivo de la Misión:</strong> {formData.objetivo_mision}<br />
+            <strong>Fecha de Salida:</strong> {formData.fecha_salida}<br />
+            <strong>Fecha de Regreso:</strong> {formData.fecha_regreso}<br />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddNew} color="primary" variant="contained">
+            Agregar uno nuevo
+          </Button>
+        </DialogActions>
+      </Dialog>
       </Box>
     );
 };
