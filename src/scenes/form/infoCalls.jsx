@@ -494,20 +494,23 @@ export const PlacaVehiculoComponent = ({onSelectRegitro}) => {
     }
   };
   return (
-    <Autocomplete
-      onChange={handleChange}
-      options={Placa}
-      getOptionLabel={(option) => option.NoPlaca}
-      renderInput={(params) => 
-      <TextField
-        {...params}  
-        fullWidth       
-        variant="filled"
-        type="text"
-        label="Seleccione Nº de Placa"
-        name="Numero_Placa"
-      />}
-    />
+    <div>
+      <br></br>
+      <Autocomplete
+        onChange={handleChange}
+        options={Placa}
+        getOptionLabel={(option) => option.NoPlaca}
+        renderInput={(params) => 
+        <TextField
+          {...params}  
+          fullWidth       
+          variant="filled"
+          type="text"
+          label="Seleccione Nº de Placa"
+          name="Numero_Placa"
+        />}
+      />
+    </div>
   );
 };
 
