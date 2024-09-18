@@ -117,7 +117,6 @@ const Form = () => {
     let montoCalculado = null;
 
     if (checkboxSeleccionado) {
-      console.log("Aqui si deberia entrar");
       dateSalida = new Date(currentDate);
       dateRegreso = new Date(currentDate);     
       if(lugar.Nombre === 'Distrito Central'){
@@ -128,9 +127,7 @@ const Form = () => {
           CodigoPeriodo: 1         
         };
         let monto = await GetMontoViaticoLempiras(MontoViatico);
-        console.log(monto);
         montoCalculado = monto * 0.25;
-        console.log(montoCalculado);
       }
       else{
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
@@ -140,12 +137,10 @@ const Form = () => {
           CodigoPeriodo: 1         
         };
         let monto = await GetMontoViaticoLempiras(MontoViatico);
-        console.log(monto);
         montoCalculado = monto * 0.50;
       }
       
     } else {
-      console.log('Checkbox no seleccionado.');
       dateSalida = new Date(values.fecha_salida);
       dateRegreso = new Date(values.fecha_regreso);
     }
@@ -156,7 +151,6 @@ const Form = () => {
  
     ///////////////////////////////////////////////////////////////////////////////
     if (dayDiff <= 30 && !checkboxSeleccionado) {
-      console.log("En teoria no deberia entrar aqui");
       if(selectedPais.CodigoPais === 'HN'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
         const MontoViatico = {
@@ -174,7 +168,6 @@ const Form = () => {
         }
         montoCalculado = await GetMontoViaticoDolares(MontoViatico);
       }
-      console.log("Menos de 30 dias");
     } else if(!checkboxSeleccionado){
       if(selectedPais.CodigoPais === 'HN'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
@@ -193,7 +186,6 @@ const Form = () => {
         }
         montoCalculado = await GetMontoViaticoDolares(MontoViatico);
       }
-      console.log("Mas de 30 dias");
     }
   
     const newDetail = {
@@ -244,7 +236,6 @@ const Form = () => {
     setresumeData(newDetail);
     //const result = await postAnticiposGastoViaje(newDetailForm);
     //const result2 = await postAnticiposDetalleMision(newDetailForm2);
-    console.log('Resultado:', newDetailForm2);
     setDetails([...details, newDetail]);
     resetForm();
     setReset(true); // Activar el reset
@@ -270,14 +261,14 @@ const Form = () => {
     img.src = logobase64;
     img.onload = function() {
 
-      doc.addImage(img, 'PNG', 20, 10, 60, 25);
+      doc.addImage(img, 'PNG', 15, 10, 60, 25);
 
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0); 
-      doc.text(resumeData.estado, 180, 20);
+      doc.text(resumeData.estado || "Estado Inicial", 170, 20);
 
       doc.setTextColor(255, 0, 0); 
-      doc.text(`Anticipo: ${resumeData.numeroAnticipos || 4505}`, 180, 30);
+      doc.text(`Anticipo: ${resumeData.numeroAnticipos}`, 170, 30);
 
       const startY = 45; 
       
@@ -286,7 +277,6 @@ const Form = () => {
       doc.text(`Empleado: ${resumeData.nombre}`, 14, startY);
       doc.text(`Área: ${resumeData.area}`, 14, startY + 7);
       doc.text(`Fecha Ingreso: ${resumeData.fecha_ingreso || "27/6/2024"}`, 14, startY + 14);
-      doc.text(`Observaciones: ${resumeData.observaciones || "-"}`, 14, startY + 21);
 
       // Definir columnas y filas
       const columns = ["Lugar a Visitar", "Objetivo Misión", "Observaciones", "Fecha Salida", "Fecha Regreso", "Descripcion Transporte", "Numero de Placa", "Tipo de Cambio", "Moneda", "Monto"];
@@ -298,7 +288,7 @@ const Form = () => {
       doc.autoTable({
         head: [columns],
         body: rows,
-        startY: startY + 30,
+        startY: startY + 20,
         theme: 'grid',
         styles: {
           fillColor: [54, 50, 54],

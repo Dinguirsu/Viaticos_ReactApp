@@ -471,7 +471,7 @@ export const TransporteComponent = ({onSelectTransport, onSelectRegitro}) => {
 };
 
 export const PlacaVehiculoComponent = ({onSelectRegitro}) => {
-  const [Placa, setPlacaVehiculo] = useState('');
+  const [Placa, setPlacaVehiculo] = useState([]);
   const [Registro, setRegistroVehiculo] = useState('');
 
   useEffect(() => {
@@ -535,7 +535,7 @@ export const GetTotalAnticipos = ({onGetDatos, onGetEstado}) => {
       try {
         const response = await axios.get(`http://localhost:3000/api/obtenerEtapa/${total}`)
         setEstado(response.data[0].CodigoEtapa);
-        onGetEstado(response.data[0].CodigoEtapa);
+        onGetEstado(response.data[0].Etapa);
       } catch (error) {
         console.error('Error enviando el total al backend:', error);
       }
@@ -610,7 +610,6 @@ export const GetCodigoZonaViaticoHN = async (NombreMunicipio) => {
 export const GetCodigoZonaViatico = async (NombrePais) => {
   try {
     const response = await axios.get(`http://localhost:3000/api/obtenerCodigoZonaViatico/${NombrePais}`);
-    console.log(response.data[0].CodigoZona);
     return response.data[0].CodigoZona; // Valor por defecto si es undefined
   } catch (error) {
     console.error('Error fetching Codigo:', error);
@@ -630,7 +629,6 @@ export const GetMontoViaticoLempiras = async (data) => {
 
 export const GetMontoViaticoDolares = async (data) => {
   try {
-    console.log(data);
     const response = await axios.get('http://localhost:3000/api/obtenerMontoViaticoDolares', {
       params: data
     });
