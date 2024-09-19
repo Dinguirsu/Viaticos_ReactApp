@@ -194,7 +194,7 @@ const Form = () => {
       area: area,
       pais_destino: (lugar.Nombre) ? lugar.Nombre : selectedPais.NombrePais,
       objetivo_mision: values.objetivo_mision,
-      fecha_salida: values.fecha_salida,
+      fecha_salida: dateSalida,
       fecha_regreso: values.fecha_regreso,
       observaciones: values.observaciones,
       monto: montoCalculado,
@@ -256,55 +256,100 @@ const Form = () => {
 
   const handleGeneratePdf = () => {
     const doc = new jsPDF('landscape');
-    
+
     const img = new Image();
-    img.src = logobase64;
+    img.src = logobase64; 
+    
     img.onload = function() {
-
-      doc.addImage(img, 'PNG', 15, 10, 60, 25);
-
+      
+      doc.addImage(img, 'PNG', 15, 10, 100, 25); 
+  
+      //doc.setDrawColor(0, 0, 0); 
+      //doc.rect(10, 10, 270, 35); 
+  
+      //doc.setFillColor(0, 0, 0); 
+      //doc.rect(10, 10, 270, 35, 'F'); 
+  
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0); 
       doc.text(resumeData.estado || "Estado Inicial", 170, 20);
-
-      doc.setTextColor(255, 0, 0); 
-      doc.text(`Anticipo: ${resumeData.numeroAnticipos}`, 170, 30);
-
-      const startY = 45; 
-      
+  
+      doc.setTextColor(0, 0, 0); 
+      doc.text(`ANTICIPO: ${resumeData.numeroAnticipos}`, 170, 30);
+  
+      const startY = 50; 
+  
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0); 
       doc.text(`Empleado: ${resumeData.nombre}`, 14, startY);
       doc.text(`Área: ${resumeData.area}`, 14, startY + 7);
-      doc.text(`Fecha Ingreso: ${resumeData.fecha_ingreso || "27/6/2024"}`, 14, startY + 14);
-
-      // Definir columnas y filas
-      const columns = ["Lugar a Visitar", "Objetivo Misión", "Observaciones", "Fecha Salida", "Fecha Regreso", "Descripcion Transporte", "Numero de Placa", "Tipo de Cambio", "Moneda", "Monto"];
-      const rows = [
-        [(lugar.Nombre) ? lugar.Nombre : selectedPais.NombrePais, resumeData.objetivo_mision, resumeData.observaciones, resumeData.fecha_salida, resumeData.fecha_regreso, resumeData.tipoTransporte, resumeData.numeroPlaca, "0.00", resumeData.moneda, resumeData.monto]
+      doc.text(`Fecha Salida: ${resumeData.fecha_salida}`, 14, startY + 14);
+  
+      doc.setLineWidth(0.5);
+      doc.line(10, startY + 18, 280, startY + 18);
+  
+      const columns = [
+        "Lugar a Visitar", 
+        "Objetivo Misión", 
+        "Observaciones", 
+        "Fecha Salida", 
+        "Fecha Regreso", 
+        "Descripcion Transporte", 
+        "Numero de Placa", 
+        "Tipo de Cambio", 
+        "Moneda", 
+        "Monto"
       ];
-
-      // Añadir la tabla al PDF
+  
+      const rows = [
+        [
+          (lugar.Nombre) ? lugar.Nombre : selectedPais.NombrePais, 
+          resumeData.objetivo_mision, 
+          resumeData.observaciones, 
+          resumeData.fecha_salida, 
+          resumeData.fecha_regreso, 
+          resumeData.tipoTransporte, 
+          resumeData.numeroPlaca, 
+          "0.00", 
+          resumeData.moneda, 
+          resumeData.monto
+        ]
+      ];
+  
       doc.autoTable({
         head: [columns],
         body: rows,
-        startY: startY + 20,
+        startY: startY + 20, 
         theme: 'grid',
         styles: {
-          fillColor: [54, 50, 54],
+          fillColor: [54, 50, 54], 
           textColor: [255, 255, 255], 
-        }
+          lineColor: [255, 255, 255],
+          lineWidth: 0.2,
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240], 
+          textColor: [0, 0, 0], 
+        },
+        headStyles: {
+          fillColor: [0, 0, 0], 
+          textColor: [255, 255, 255], 
+          fontSize: 12, 
+        },
       });
-
-      // Guardar el PDF
+  
       doc.save('table.pdf');
-
-      // Mostrar el PDF en el navegador
+  
       const pdfBlob = doc.output('blob');
       const pdfUrl = URL.createObjectURL(pdfBlob);
       window.open(pdfUrl);
     };
+  
+    img.onerror = function() {
+      console.error("Error al cargar la imagen del logo.");
+    };
   };
+  
 
     return (
       <Box m="20px"> 
