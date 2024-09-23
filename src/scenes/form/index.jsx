@@ -4,8 +4,6 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import React, { useState } from 'react';
-import {Grid} from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '.././../theme';
 import { NombreEmpleadoComponent, AreaEmpleadoComponent, TipoEmpleadoComponent, SelectContinentes, TransporteComponent, GetTotalAnticipos, TipoCambioComponent, postAnticiposDetalleMision, postAnticiposGastoViaje, GetCodigoZonaViatico, GetCodigoZonaViaticoHN, GetMontoViaticoDolares, GetMontoViaticoLempiras} from "./infoCalls";
@@ -48,8 +46,6 @@ const Form = () => {
   const today2 = new Date().toISOString().split('T')[0];
   const [details, setDetails] = useState([]);
 
- 
-
   const handleEmpleadoChange = (nombreEmpleado) => {
     setEmpleado(nombreEmpleado);
   };
@@ -83,7 +79,6 @@ const Form = () => {
   };
 
   const handleRegistro = (idRegister) => {
-    //setLugar(lugar);
     setRegistro(idRegister);
   };
 
@@ -224,7 +219,7 @@ const Form = () => {
       FechaSalida: (checkboxSeleccionado) ? fechaSalida : values.fecha_salida,
       FechaRegreso: (checkboxSeleccionado) ? fechaRegreso : values.fecha_regreso,
       IDTransporte: transport.IDTransporte,
-      NumeroPlaca: registro.NoPlaca,
+      NumeroPlaca: (transport.IDTransporte !== 1) ? "No Aplica" : registro.NoPlaca,
       TipoCambio: cambio,
       Moneda: moneda,
       Monto: montoCalculado,
@@ -350,7 +345,6 @@ const Form = () => {
     };
   };
   
-
     return (
       <Box m="20px"> 
         <Formik
