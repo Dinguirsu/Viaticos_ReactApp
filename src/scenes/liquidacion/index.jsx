@@ -1,4 +1,3 @@
-
 import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -14,7 +13,7 @@ const Liquidacion = () => {
   };
 
   return (
-    <Grid container spacing={-4}>
+    <Grid container>
     <Box m="20px">
       <Header title="Liquidacion de Gastos de Viaje" subtitle="Datos Generales" />
 
