@@ -4,23 +4,62 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import {Grid} from '@mui/material';
+import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import FileUpload from './upload';
+import { Upload } from "@mui/icons-material";
+
+const today = new Date();
+const month = today.getMonth()+1;
+const year = today.getFullYear();
+const date = today.getDate();
+const currentDate = month + "/" + date + "/" + year;
 
 const Liquidacion = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [liquidacion, setLiquidacion] = useState([]); 
+  const location = useLocation();
+  const { anticipo } = useState('');;
+  const [numeroLiquidacion, setNumeroLiq] = useState(""); 
+
+  useEffect(() => {
+    const fetchAnticipos = async () => {
+    try { 
+        const response2 = await axios.get(`http://localhost:3000/api/obtenerCodigoLiquidacion`);
+        setNumeroLiq(response2.data);
+    } catch (error) {
+        console.error('Error fetching Liquidaciones:', error);
+    }
+    };
+
+    fetchAnticipos();
+}, []
+);
 
   const handleFormSubmit = (values) => {
     console.log(values);
   };
 
   return (
-    <Grid container>
-    <Box m="20px">
+    <Grid container justifyContent="center" alignItems="center">
+    <Box
+      m="20px"
+      p="20px"
+      width="60%" // Ajusta el ancho según tu necesidad
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      backgroundColor="#2b2d42" // Combina con tu tema
+      borderRadius="10px"
+      boxShadow="0 4px 8px rgba(0, 0, 0, 0.3)"
+    >
       <Header title="Liquidacion de Gastos de Viaje" subtitle="Datos Generales" />
-
+  
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        //validationSchema={checkoutSchema}
       >
         {({
           values,
@@ -28,133 +67,102 @@ const Liquidacion = () => {
           handleChange,
           handleSubmit,
         }) => (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} style={{ width: "100%" }}>
             <Box
               display="grid"
               gap="20px"
               gridTemplateColumns="repeat(4, minmax(0, 1fr))"
               sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 2" },
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
               <TextField
                 fullWidth
-                disabled= "true"
+                disabled
                 variant="filled"
                 type="text"
                 label="Numero de Liquidacion"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.numeroLiquidacion}
+                value={numeroLiquidacion.nextNumeroLiquidacion}
                 name="numeroLiquidacion"
                 sx={{ gridColumn: "span 4" }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
               />
               <TextField
-                disabled= "true"
                 fullWidth
+                disabled
                 variant="filled"
                 type="text"
                 label="Empleado"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.empleado}
+                value={anticipo.Empleado = "Empleado"}
                 name="empleado"
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
-                disabled= "true"
                 fullWidth
+                disabled
                 variant="filled"
                 type="text"
                 label="Area Solicitante"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.areaSolicitante}
+                value={anticipo.Area}
                 name="areaSolicitante"
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 fullWidth
-                disabled= "true"
+                disabled
                 variant="filled"
                 type="text"
                 label="Fecha de Liquidacion"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.fechaLiquidacion}
+                value={currentDate}
                 name="fechaliquidacion"
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 fullWidth
-                disabled= "true"
+                disabled
                 variant="filled"
                 type="text"
                 label="Autorizacion de Anticipo"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.autorizacionAnticipo}
+                value={anticipo.NumeroAutorizacion}
                 name="autorizacionAnticipo"
                 sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
-                disabled= "true"
+                disabled
                 variant="filled"
                 type="text"
                 label="Total Anticipo"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.totalAnticipo}
+                value={anticipo.MontoAnticipo}
                 name="totalAnticipo"
                 sx={{ gridColumn: "span 2" }}
               />
             </Box>
+  
+            <br />
+            <FileUpload numeroLiquidacion={numeroLiquidacion?.nextNumeroLiquidacion} />
+  
 
-            <Box
-            display="grid"
-            gap="20px"
-            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-            sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-            }}>
-            <Header title="Datos de Mision" subtitle="Detalles Finales" />
-            <TextField
-                fullWidth
-                disabled= "true"
-                variant="filled"
-                type="text"
-                label="Total de Viaticos y Otros Gastos:"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.totalViaticos}
-                name="totalViaticos"
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                disabled= "true"
-                variant="filled"
-                type="text"
-                label="Diferencia Anticipos Gastos en Lps:"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.diferenciaAnticipo}
-                name="diferenciaAnticipo"
-                sx={{ gridColumn: "span 4" }}
-              />
-            </Box>
-
-            <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
-                Create New User
-              </Button>
-            </Box>
           </form>
         )}
       </Formik>
     </Box>
-    </Grid>
+  </Grid>
+  
   );
 };
 

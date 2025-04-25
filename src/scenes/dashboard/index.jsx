@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button } from '@mui/material';
 import axios from 'axios';  
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const usuario = 615;
-    const [anticipos, setAnticipos] = useState([]);  
+  const usuario = 615;
+  const [anticipos, setAnticipos] = useState([]);  
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+      const fetchAnticipos = async () => {
+      try {
+          const response = await axios.get(`http://localhost:3000/api/obtenerAnticiposByIDEmpleado/${usuario}`);  
+          setAnticipos(response.data);  
+      } catch (error) {
+          console.error('Error fetching anticipos:', error);
+      }
+      };
 
-    useEffect(() => {
-        const fetchAnticipos = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/obtenerAnticiposByIDEmpleado/${usuario}`);  
-            setAnticipos(response.data);  
-        } catch (error) {
-            console.error('Error fetching anticipos:', error);
-        }
-        };
+      fetchAnticipos();
+  }, []
+  );
 
-        fetchAnticipos();
-    }, []
-    );
+  const handleLiquidar = (anticipo) => {
+    navigate('/liquidacion', { state: { anticipo } });
+  };
 
   return (
     <>
@@ -37,6 +43,7 @@ const Dashboard = () => {
               <TableCell>Etapa</TableCell>
               <TableCell>Lugar a Visitar</TableCell>
               <TableCell>Monto Anticipo</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -49,7 +56,12 @@ const Dashboard = () => {
                 <TableCell>{anticipo.Etapa}</TableCell>
                 <TableCell>{anticipo.LugarAVisitar}</TableCell>
                 <TableCell>{anticipo.MontoAnticipo}</TableCell>
-              </TableRow>
+                <TableCell>
+                  <Button type="submit" color="primary" variant="contained" onClick={() => handleLiquidar(anticipo)}>
+                    Liquidar
+                  </Button>
+                  </TableCell>
+                </TableRow>
             ))}
           </TableBody>
         </Table>

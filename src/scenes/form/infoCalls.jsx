@@ -24,6 +24,15 @@ export const NombreEmpleadoComponent = ({onEmpleadoChange}) => {
   return ([]);
 };
 
+export const obtenerAnticipos = ({NumeroAutorizacion}) => {
+  try {
+    const response = axios.get(`http://localhost:3000/api/obtenerLiquidacionesByAnticipo/${NumeroAutorizacion}`);
+    return (response.data);
+  } catch (error) {
+    console.error('Error fetching the employee name:', error);
+  }
+};
+
 export const AreaEmpleadoComponent = ({onAreaChange}) => {
     const [Area, setAreaEmpleado] = useState('');
     const usuario = 'admin'; // El parámetro que quieres pasar
