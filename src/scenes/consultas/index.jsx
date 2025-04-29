@@ -1,14 +1,6 @@
 import '../consultas/style.css';
-import { Box } from "@mui/material";
-import {Grid} from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import React, { useEffect, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
-import { tokens } from '.././../theme';
-import Header from "../../components/Header";
+import React, { useState } from 'react';
 import axios from "axios";
-import AnticiposTable from "./anticiposTable";
-import LiquidacionesTable from "./LiquidacionesTable";
 
 const Consultas = () => {
 
@@ -20,8 +12,6 @@ const Consultas = () => {
     const [anticipos, setAnticipos] = useState([]);
     const [liquidaciones, setliquidaciones] = useState([]);
     const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
     const [filtroActivo, setFiltroActivo] = useState("");  
     const [tipoFiltroActivo, setTipoFiltroActivo] = useState("");  
     const [tipoFiltro, setTipoFiltro] = useState("anticipos");
@@ -178,16 +168,17 @@ const Consultas = () => {
 
     const fetchLiquidacionesPorEtapa = async (etapaSeleccionada) => {
       const Usuario = 'martha.dubon';
+      console.log("Entro de nuevo");
       try {
           const response = await axios.get(
               `http://localhost:3000/api/obtenerLiquidacionesEtapas/${etapaSeleccionada}/${Usuario}`
           );
-          setliquidaciones(response.data); // Guardar resultados
+          setliquidaciones(response.data);
           setError(null);
       } catch (error) {
           console.error("Error al obtener anticipos por Etapa:", error);
           setError("No se encontraron anticipos para este rango de fechas.");
-          setAnticipos([]); // Limpiar resultados en caso de error
+          setAnticipos([]);
       }
   };
 
@@ -337,7 +328,10 @@ const Consultas = () => {
                       <tr>
                           <th># Autorización</th>
                           <th>Código Etapa</th>
-                          <th>Lugar a Visitar</th>
+                          {liquidaciones.LugarAVisitar && liquidaciones.LugarAVisitar.trim() !== "" ? (
+                                <th>Lugar a Visitar</th>
+                              ) : null}
+                          
                           <th>Descripcion</th>
                           <th>Fecha Salida</th>
                           <th>Monto</th>
@@ -347,8 +341,10 @@ const Consultas = () => {
                       {liquidaciones.map((liquidaciones, index) => (
                           <tr key={index}>
                               <td>{liquidaciones.NumeroLiquidacion}</td>
-                              <td>{liquidaciones.CodigoEtapa}</td>
-                              <td>{liquidaciones.LugarAVisitar}</td>
+                              <td>{liquidaciones.Etapa}</td>
+                              {liquidaciones.LugarAVisitar && liquidaciones.LugarAVisitar.trim() !== "" ? (
+                                <td>{liquidaciones.LugarAVisitar}</td>
+                              ) : null}
                               <td>{liquidaciones.Descripcion}</td>
                               <td>{new Date(liquidaciones.FechaIngreso).toLocaleDateString()}</td>
                               <td>{liquidaciones.Monto !== undefined && liquidaciones.Monto !== null
