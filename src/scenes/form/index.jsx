@@ -112,8 +112,8 @@ const Form = () => {
     let montoCalculado = null;
 
     if (checkboxSeleccionado) {
-      dateSalida = new Date(currentDate);
-      dateRegreso = new Date(currentDate);     
+      dateSalida = new Date(currentDate).toISOString().split('T')[0];
+      dateRegreso = new Date(currentDate).toISOString().split('T')[0];     
       if(lugar.Nombre === 'Distrito Central'){
         const codigoZonaViatico = await GetCodigoZonaViaticoHN(lugar.Nombre)
         const MontoViatico = {
@@ -136,13 +136,16 @@ const Form = () => {
       }
       
     } else {
-      dateSalida = new Date(values.fecha_salida);
-      dateRegreso = new Date(values.fecha_regreso);
+      dateSalida = new Date(values.fecha_salida).toISOString().split('T')[0];
+      dateRegreso = new Date(values.fecha_regreso).toISOString().split('T')[0];
     }
 
-    
-    const timeDiff = dateRegreso.getTime() - dateSalida.getTime();
+    const salida = new Date(dateSalida);
+    const regreso = new Date(dateRegreso);
+
+    const timeDiff = regreso.getTime() - salida.getTime();
     const dayDiff = timeDiff / (1000 * 3600 * 24);
+
  
     ///////////////////////////////////////////////////////////////////////////////
     if (dayDiff <= 30 && !checkboxSeleccionado) {
@@ -226,11 +229,15 @@ const Form = () => {
       SistemaUsuario: empleado.Empleado,
       SistemaFecha: currentDate
     };
+
     setFormData(newDetail);
     setOpenDialog(true);
     setresumeData(newDetail);
+    console.log(newDetail);
+    console.log(newDetailForm);
+    console.log(newDetailForm2);
     //const result = await postAnticiposGastoViaje(newDetailForm);
-    //const result2 = await postAnticiposDetalleMision(newDetailForm2);
+    //const result2 = await postAnticiposDetalleMision(newDetailForm2); 
     setDetails([...details, newDetail]);
     resetForm();
     setReset(true); // Activar el reset
@@ -258,12 +265,6 @@ const Form = () => {
     img.onload = function() {
       
       doc.addImage(img, 'PNG', 15, 10, 100, 25); 
-  
-      //doc.setDrawColor(0, 0, 0); 
-      //doc.rect(10, 10, 270, 35); 
-  
-      //doc.setFillColor(0, 0, 0); 
-      //doc.rect(10, 10, 270, 35, 'F'); 
   
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0); 
@@ -533,17 +534,10 @@ const Form = () => {
 };
 
 const checkoutSchema = yup.object().shape({
-  //nombre: yup.string().required("required"),
-  //area_Solicitada: yup.string().required("required"),
-  //tipo_empleado: yup.string().required("required"),
-  //fecha_ingreso: yup.string().required("required"),
-  //continente: yup.string().required("required"),
-  //pais_destino: yup.string().required("required"),
   objetivo_mision: yup.string().required("required"),
   observaciones: yup.string().required("required"),
   fecha_salida: yup.string().required("required"),
   fecha_regreso: yup.string().required("required"),
-  //placa_automovil: yup.string().required("required")
 });
 
 const initialValues = { 

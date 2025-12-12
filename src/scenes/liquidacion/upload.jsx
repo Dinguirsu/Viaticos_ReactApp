@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './FileUpload.css'; // Import a CSS file for styling
-import axios from 'axios';
-import { Button, Box, Typography } from "@mui/material";
+import { Button, Box, Typography, Alert } from "@mui/material";
+import { cargarLiquidacion } from '../../login/Services/anticiposService';
 
 const FileUpload = ({ numeroLiquidacion }) => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -29,19 +29,22 @@ const FileUpload = ({ numeroLiquidacion }) => {
         };
 
         const fileExtension = `.${selectedFile.name.split('.').pop()}`;
-        console.log(fileExtension);
         const contentType = validExtensions[fileExtension] || '';
-        console.log(contentType);
 
         if (contentType) {
             const formData = new FormData();
             formData.append('file', selectedFile);
             formData.append('numeroLiquidacion', numeroLiquidacion);
-
             try {
-                const response = await axios.post('http://localhost:3000/api/cargarLiquidacion', formData);
+
+                const response = await cargarLiquidacion(formData);
                 setMessage('Archivo subido exitosamente');
-                console.log(message);
+                
+                if (response.status === 200) {
+                    setMessage('Archivo subido exitosamente');
+                } else {
+                    setMessage(`Error del servidor: ${response.statusText}`);
+                }
 
             } catch (error) {
                 console.error('Error al subir el archivo:', error);
@@ -54,18 +57,24 @@ const FileUpload = ({ numeroLiquidacion }) => {
 
     return (
         <Box mt="20px">
-        <Typography variant="h6" mb="10px">
-            Cargar Archivo
-        </Typography>
-        <input type="file" name="file" onChange={handleFileChange} />
-        <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFileUpload}
-            style={{ marginTop: '10px' }}
-        >
-            Guardar Liquidacion
-        </Button>
+            <Typography variant="h6" mb="10px">
+                Cargar Archivo
+            </Typography>
+            <input type="file" name="file" onChange={handleFileChange} />
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleFileUpload}
+                style={{ marginTop: '10px' }}
+            >
+                Guardar Liquidacion
+            </Button>
+
+            {message && (
+                <Alert severity={message.includes('exitosamente') ? "success" : "error"} sx={{ mt: 2 }}>
+                    {message}
+                </Alert>
+            )}
         </Box>
     );
 };

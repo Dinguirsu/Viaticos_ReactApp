@@ -1,6 +1,9 @@
 import '../consultas/style.css';
 import React, { useState } from 'react';
 import axios from "axios";
+import { obtenerEtapas } from '../../login/Services/anticiposService';
+import api from '../../login/Services/api';
+
 
 const Consultas = () => {
 
@@ -18,8 +21,8 @@ const Consultas = () => {
 
     const fetchEtapas = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:3000/api/obtenerEtapas/` // Ajusta tu endpoint
+          const response = await api.get(
+            `/anticipos/obtenerEtapas` // Ajusta tu endpoint
           );
           setEtapas(response.data); // Guardamos las etapas en el estado
           setError(null);
@@ -31,8 +34,8 @@ const Consultas = () => {
 
     const fetchEtapasLiquidacion = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/obtenerEtapasLiquidacion/` // Ajusta tu endpoint
+        const response = await api.get(
+          `/anticipos/obtenerEtapasLiquidacion/` // Ajusta tu endpoint
         );
         setEtapas(response.data); // Guardamos las etapas en el estado
         setError(null);
@@ -40,7 +43,7 @@ const Consultas = () => {
         console.error("Error al obtener etapas:", error);
         setError("No se pudieron cargar las etapas.");
       }
-  };
+    };
 
     const handleChange = (event) => {
         setSelectedEtapa(event.target.value);
@@ -48,9 +51,8 @@ const Consultas = () => {
 
     const fetchAllAnticipos = async () => {
         try {
-            const usuario = 615;
-            const response = await axios.get(
-            `http://localhost:3000/api/obtenerAnticiposByIDEmpleado/${usuario}` 
+            const response = await api.get(
+            `/anticipos/obtenerAnticiposByIDEmpleado` 
           );
           setAnticipos(response.data); 
           setError(null);
@@ -63,8 +65,8 @@ const Consultas = () => {
     const fetchAllLiquidaciones = async () => {
         try {
             const SistemaUsuario = 'eduardo.rosales';
-            const response = await axios.get(
-            `http://localhost:3000/api/obtenerAnticipoParaLiquidar/${SistemaUsuario}` 
+            const response = await api.get(
+            `/anticipos/obtenerAnticipoParaLiquidar` 
           );
           console.log(response.data);
           setliquidaciones(response.data); 
@@ -75,8 +77,9 @@ const Consultas = () => {
         }
     };
     
-    const handleBuscarClick = () => {
+    const handleBuscarClick = async () => {
         fetchEtapas(); 
+        //await obtenerEtapas();
         setShowDropdown(true); 
         setFiltroActivo("etapas");
         setTipoFiltroActivo("anticipo");
@@ -92,10 +95,10 @@ const Consultas = () => {
     const fetchAnticipos = async (etapaSeleccionada) => {
         const sistemaUsuario = "ADMIN";
         try {
-            const response = await axios.get(
-                `http://localhost:3000/api/obtenerAnticipoEtapas/${etapaSeleccionada}/${sistemaUsuario}`
+            const response = await api.get(
+                `/anticipos/obtenerAnticipoEtapas/${etapaSeleccionada}`
             );
-            console.log(response.data);
+
           setAnticipos(response.data);
           setError(null);
         } catch (error) {
@@ -135,11 +138,10 @@ const Consultas = () => {
     };
 
     const fetchAnticiposPorFechas = async () => {
-        const Usuario = "ADMIN";
         const { startDate, endDate } = dateRange;
         try {
-            const response = await axios.get(
-                `http://localhost:3000/api/obtenerAnticipoFecha/${startDate}/${endDate}/${Usuario}`
+            const response = await api.get(
+                `/anticipos/obtenerAnticipoFecha/${startDate}/${endDate}`
             );
             setAnticipos(response.data); // Guardar resultados
             setError(null);
@@ -151,11 +153,10 @@ const Consultas = () => {
     };
 
     const fetchLiquidacionesPorFechas = async () => {
-        const Usuario = 'martha.dubon';
         const { startDate, endDate } = dateRange;
         try {
-            const response = await axios.get(
-                `http://localhost:3000/api/obtenerLiquidacionesFecha/${startDate}/${endDate}/${Usuario}`
+            const response = await api.get(
+                `/anticipos/obtenerLiquidacionesFecha/${startDate}/${endDate}`
             );
             setAnticipos(response.data); // Guardar resultados
             setError(null);
@@ -167,11 +168,9 @@ const Consultas = () => {
     };
 
     const fetchLiquidacionesPorEtapa = async (etapaSeleccionada) => {
-      const Usuario = 'martha.dubon';
-      console.log("Entro de nuevo");
       try {
-          const response = await axios.get(
-              `http://localhost:3000/api/obtenerLiquidacionesEtapas/${etapaSeleccionada}/${Usuario}`
+          const response = await api.get(
+              `/anticipos/obtenerLiquidacionesEtapas/${etapaSeleccionada}`
           );
           setliquidaciones(response.data);
           setError(null);
@@ -180,7 +179,7 @@ const Consultas = () => {
           setError("No se encontraron anticipos para este rango de fechas.");
           setAnticipos([]);
       }
-  };
+    };
 
     return (
         <div className="App">
@@ -327,7 +326,7 @@ const Consultas = () => {
                   <thead>
                       <tr>
                           <th># Autorización</th>
-                          <th>Código Etapa</th>
+                          <th>Etapa</th>
                           {liquidaciones.LugarAVisitar && liquidaciones.LugarAVisitar.trim() !== "" ? (
                                 <th>Lugar a Visitar</th>
                               ) : null}

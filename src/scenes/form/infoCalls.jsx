@@ -3,15 +3,16 @@ import axios from 'axios';
 import { TextField, Typography, Box } from "@mui/material";
 import Autocomplete from '@mui/material/Autocomplete';
 import { red } from '@mui/material/colors';
+import api from "../../login/Services/api";
 
 export const NombreEmpleadoComponent = ({onEmpleadoChange}) => {
   const [Empleado, setNombreEmpleado] = useState('');
-  const usuario = 'admin'; // El parámetro que quieres pasar
+  const usuario = 'ADMIN'; // El parámetro que quieres pasar
 
   useEffect(() => {
     const fetchNombreEmpleado = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/NombreEmpleado/${usuario}`);
+        const response = await api.get(`/anticipos/NombreEmpleado/`);
         setNombreEmpleado(response.data.Empleado);
         onEmpleadoChange(response.data);
       } catch (error) {
@@ -26,7 +27,7 @@ export const NombreEmpleadoComponent = ({onEmpleadoChange}) => {
 
 export const obtenerAnticipos = ({NumeroAutorizacion}) => {
   try {
-    const response = axios.get(`http://localhost:3000/api/obtenerLiquidacionesByAnticipo/${NumeroAutorizacion}`);
+    const response = api.get(`/anticipos/obtenerLiquidacionesByAnticipo/${NumeroAutorizacion}`);
     return (response.data);
   } catch (error) {
     console.error('Error fetching the employee name:', error);
@@ -40,7 +41,7 @@ export const AreaEmpleadoComponent = ({onAreaChange}) => {
     useEffect(() => {
       const fetchAreaEmpleado = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/api/AreaEmpleado/${usuario}`);
+          const response = await api.get(`/anticipos/AreaEmpleado`);
           setAreaEmpleado(response.data.Area);
           onAreaChange(response.data.Area);
         } catch (error) {
@@ -60,7 +61,7 @@ export const TipoEmpleadoComponent = ({onTipoEmpleado}) => {
   useEffect(() => {
     const fetchTipoEmpleado = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/TipoEmpleado/${usuarioId}`);
+        const response = await api.get(`/anticipos/TipoEmpleado`);
         setTipoEmpleado(response.data.TipoCargo);
         onTipoEmpleado(response.data.CodigoTipoCargo)
       } catch (error) {
@@ -105,7 +106,7 @@ export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, reset}) 
   useEffect(() => {
     const fetchContinente = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/continentes`);        
+        const response = await api.get(`/anticipos/continentes`);        
         setContinentes(response.data);
 
       } catch (error) {
@@ -182,7 +183,7 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
     const fetchPaises = async () => {
       if (continente) {
         try {
-          const response = await axios.get(`http://localhost:3000/api/pais/${continente.CodigoContinente}`);
+          const response = await api.get(`/anticipos/pais/${continente.CodigoContinente}`);
           setPaises(response.data);
         } catch (error) {
           console.error('Error fetching the countries:', error);
@@ -275,7 +276,7 @@ export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
     const fetchPaises = async () => {
       if (pais && pais.CodigoPais === 'HN') {
         try {
-          const response = await axios.get(`http://localhost:3000/api/departamentos`);
+          const response = await api.get(`/anticipos/departamentos`);
           setDepartamento(response.data);
         } catch (error) {
           console.error('Error fetching the countries:', error);
@@ -361,7 +362,7 @@ export const MuniSelector = ({ depto, disabled, onLugar, reset }) => {
     const fetchMunicipio = async () => {
       if (depto) {
         try {
-          const response = await axios.get(`http://localhost:3000/api/municipio/${depto.IDDept}`);
+          const response = await api.get(`/anticipos/municipio/${depto.IDDept}`);
           setMunicipio(response.data);
         } catch (error) {
           console.error('Error fetching the countries:', error);
@@ -382,10 +383,10 @@ export const MuniSelector = ({ depto, disabled, onLugar, reset }) => {
   }, [reset]);
 
   const handleChange = (event, newValue) => {
-    setSelectedMuni(newValue);
-    setSelectedMuni(newValue);
+    setSelectedMuni(newValue.Nombre);
+    setSelectedMuni(newValue.Nombre);
     if (onLugar && newValue) {
-      onLugar(newValue);
+      onLugar(newValue.Nombre);
     }
   };
 
@@ -439,7 +440,7 @@ export const TransporteComponent = ({onSelectTransport, onSelectRegitro}) => {
   useEffect(() => {
     const fetchTransporte = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/transporte`);
+        const response = await api.get(`/anticipos/transporte`);
         setTransporte(response.data);
       } catch (error) {
         console.error('Error fetching the type transport:', error);
@@ -486,7 +487,7 @@ export const PlacaVehiculoComponent = ({onSelectRegitro}) => {
   useEffect(() => {
     const fetchPlacaVehiculo = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/placa`);
+        const response = await api.get(`/anticipos/placa`);
         setPlacaVehiculo(response.data);
       } catch (error) {
         console.error('Error fetching the type placa:', error);
@@ -530,7 +531,7 @@ export const GetTotalAnticipos = ({onGetDatos, onGetEstado}) => {
   useEffect(() => {
     const fetchTotalAnticipos = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/totalAnticipos`);
+        const response = await api.get(`/anticipos/totalAnticipos`);
         setTotalAnticipos(response.data[0].total);
         const totalAnticipos = response.data[0].total;
         onGetDatos(response.data[0].total + 1);
@@ -542,7 +543,7 @@ export const GetTotalAnticipos = ({onGetDatos, onGetEstado}) => {
 
     const enviarTotalAlBackend = async (total) => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/obtenerEtapa/${total}`)
+        const response = await api.get(`/anticipos/obtenerEtapa/${total}`)
         setEstado(response.data[0].CodigoEtapa);
         onGetEstado(response.data[0].Etapa);
       } catch (error) {
@@ -569,7 +570,8 @@ export const GetTotalAnticipos = ({onGetDatos, onGetEstado}) => {
 
 export const postAnticiposGastoViaje = async (data) => {
   try {
-    const response = await axios.post('http://localhost:3000/api/ingresoFormulario', data);
+    const response = await api.post('/anticipos/ingresoFormulario', data);
+    console.log("ENTRO PARTE 1");
     return response.data;
   } catch (error) {
     console.error('Error posting anticipos detalle mision:', error);
@@ -579,7 +581,8 @@ export const postAnticiposGastoViaje = async (data) => {
 
 export const postAnticiposDetalleMision = async (data) => {
   try {
-    const response = await axios.post('http://localhost:3000/api/ingresoFormularioDetalle', data);
+    const response = await api.post('/anticipos/ingresoFormularioDetalle', data);
+    console.log("ENTRO PARTE 2");
     return response.data;
   } catch (error) {
     console.error('Error posting anticipos detalle mision:', error);
@@ -593,7 +596,7 @@ export const TipoCambioComponent = ({getCambio}) => {
   useEffect(() => {
     const fetchCambioDivisa = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/obtenerCambioDolar`);
+        const response = await api.get(`/anticipos/obtenerCambioDolar`);
         const cotizacion = response.data[0].CotizacionDolarVenta; // Valor por defecto si es undefined
         setTipoCambio(cotizacion);
         getCambio(cotizacion);
@@ -609,7 +612,7 @@ export const TipoCambioComponent = ({getCambio}) => {
 
 export const GetCodigoZonaViaticoHN = async (NombreMunicipio) => {
   try {
-    const response = await axios.get(`http://localhost:3000/api/obtenerCodigoZonaViaticoHN/${NombreMunicipio}`);
+    const response = await api.get(`/anticipos/obtenerCodigoZonaViaticoHN/${NombreMunicipio}`);
     return response.data[0].CodigoZonaViaticos; // Valor por defecto si es undefined
   } catch (error) {
     console.error('Error fetching Codigo:', error);
@@ -618,7 +621,7 @@ export const GetCodigoZonaViaticoHN = async (NombreMunicipio) => {
 
 export const GetCodigoZonaViatico = async (NombrePais) => {
   try {
-    const response = await axios.get(`http://localhost:3000/api/obtenerCodigoZonaViatico/${NombrePais}`);
+    const response = await api.get(`/anticipos/obtenerCodigoZonaViatico/${NombrePais}`);
     return response.data[0].CodigoZona; // Valor por defecto si es undefined
   } catch (error) {
     console.error('Error fetching Codigo:', error);
@@ -627,7 +630,7 @@ export const GetCodigoZonaViatico = async (NombrePais) => {
 
 export const GetMontoViaticoLempiras = async (data) => {
   try {
-    const response = await axios.get(`http://localhost:3000/api/obtenerMontoViaticoLempiras`, {
+    const response = await api.get(`/anticipos/obtenerMontoViaticoLempiras`, {
       params: data
     });
     return response.data[0].Monto
@@ -638,7 +641,7 @@ export const GetMontoViaticoLempiras = async (data) => {
 
 export const GetMontoViaticoDolares = async (data) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/obtenerMontoViaticoDolares', {
+    const response = await api.get('/anticipos/obtenerMontoViaticoDolares', {
       params: data
     });
     return response.data[0].Monto

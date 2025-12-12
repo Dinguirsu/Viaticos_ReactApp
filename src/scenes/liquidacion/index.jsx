@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FileUpload from './upload';
 import { Upload } from "@mui/icons-material";
+import {obtenerCodigoLiquidacion} from "../../login/Services/liquidacionesService";
 
 const today = new Date();
 const month = today.getMonth()+1;
@@ -20,22 +21,22 @@ const Liquidacion = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [liquidacion, setLiquidacion] = useState([]); 
   const location = useLocation();
-  const { anticipo } = useState('');;
+  const anticipo = location.state?.anticipo || {};
   const [numeroLiquidacion, setNumeroLiq] = useState(""); 
+  //const [anticipo, setAnticipo] = useState({});
 
   useEffect(() => {
     const fetchAnticipos = async () => {
-    try { 
-        const response2 = await axios.get(`http://localhost:3000/api/obtenerCodigoLiquidacion`);
-        setNumeroLiq(response2.data);
-    } catch (error) {
+      try { 
+        const liquidacionCodigo = await obtenerCodigoLiquidacion();
+        setNumeroLiq(liquidacionCodigo || []);
+      } catch (error) {
         console.error('Error fetching Liquidaciones:', error);
-    }
+      }
     };
 
     fetchAnticipos();
-}, []
-);
+  }, []);
 
   const handleFormSubmit = (values) => {
     console.log(values);
@@ -84,7 +85,7 @@ const Liquidacion = () => {
                 label="Numero de Liquidacion"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={numeroLiquidacion.nextNumeroLiquidacion}
+                value={numeroLiquidacion.nextNumeroLiquidacion || ""}
                 name="numeroLiquidacion"
                 sx={{ gridColumn: "span 4" }}
                 InputLabelProps={{
@@ -99,7 +100,7 @@ const Liquidacion = () => {
                 label="Empleado"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={anticipo.Empleado = "Empleado"}
+                value={anticipo.Empleado || ""}
                 name="empleado"
                 sx={{ gridColumn: "span 4" }}
               />
@@ -111,7 +112,7 @@ const Liquidacion = () => {
                 label="Area Solicitante"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={anticipo.Area}
+                value={anticipo.Area || ""}
                 name="areaSolicitante"
                 sx={{ gridColumn: "span 4" }}
               />
@@ -123,7 +124,7 @@ const Liquidacion = () => {
                 label="Fecha de Liquidacion"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={currentDate}
+                value={currentDate || ""}
                 name="fechaliquidacion"
                 sx={{ gridColumn: "span 4" }}
               />
@@ -135,7 +136,7 @@ const Liquidacion = () => {
                 label="Autorizacion de Anticipo"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={anticipo.NumeroAutorizacion}
+                value={anticipo.NumeroAutorizacion || ""}
                 name="autorizacionAnticipo"
                 sx={{ gridColumn: "span 2" }}
               />
@@ -147,7 +148,7 @@ const Liquidacion = () => {
                 label="Total Anticipo"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={anticipo.MontoAnticipo}
+                value={anticipo.MontoAnticipo || ""}
                 name="totalAnticipo"
                 sx={{ gridColumn: "span 2" }}
               />
@@ -155,8 +156,6 @@ const Liquidacion = () => {
   
             <br />
             <FileUpload numeroLiquidacion={numeroLiquidacion?.nextNumeroLiquidacion} />
-  
-
           </form>
         )}
       </Formik>

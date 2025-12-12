@@ -1,51 +1,57 @@
-import { ColorModelContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Topbar from "./scenes/global/Topbar";
-import Sidebar from "./scenes/global/Sidebar"
+import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/Team";
-// import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
-// import Bar from "./scenes/bar";
 import Form from "./scenes/form";
 import Liquidacion from "./scenes/liquidacion";
-// import Line from "./scenes/line";
-// import Pie from "./scenes/pie";
-// import FAQ from "./scenes/faq";
-// import Geography from "./scenes/geography";
-import Consultas from './scenes/consultas';
+import Anticipos from "./scenes/anticipos/index";
+import AprobacionAnticipos from "./scenes/anticipos/aprobarAnticipos";
+import AprobacionAnticiposDIFA from "./scenes/anticipos/aprobarAnticiposDIFA";
+import Consultas from './pages/Consultas';
+import Login from './login/Login';
+import { ColorModelContext, useMode } from './theme'; 
+
 
 function App() {
-
   const [theme, colorMode] = useMode();
+  const location = useLocation();
+
+  // si estás en "/", mostramos solo el login (sin sidebar/topbar)
+  const isLoginPage = location.pathname === "/";
 
   return (
     <ColorModelContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        <CssBaseline/>
+        <CssBaseline />
         <div className="app">
-          <Sidebar />
-          <main className='content'>
-            <Topbar/>
+          {!isLoginPage && <Sidebar />}
+          <main className="content">
+            {!isLoginPage && <Topbar />}
+
             <Routes>
-                <Route path='/' element={<Dashboard/>} />
-                <Route path='/team' element={<Team/>} />
-                <Route path='/contacts' element={<Contacts/>} />
-                <Route path='/form' element={<Form/>} />
-                <Route path='/consultas' element={<Consultas/>} />               
-                {/*{<Route path='/bar' element={<Bar/>} />
-                <Route path='/pie' element={<Pie/>} />
-                <Route path='/line' element={<Line/>} />
-                <Route path='/faq' element={<FAQ/>} />
-                <Route path='/geography' element={<Geography/>} />*/}
-                <Route path='/liquidacion' element={<Liquidacion/>} /> 
+              {/* LOGIN */}
+              <Route path="/" element={<Login />} />
+
+              {/* RUTAS DE LA APP */}
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/form" element={<Form />} />
+              <Route path="/consultas" element={<Consultas />} />
+              <Route path="/liquidacion" element={<Liquidacion />} />
+              <Route path="/anticipos" element={<Anticipos />} />
+              <Route path="/aprobacionanticipos" element={<AprobacionAnticipos />} />
+              <Route path="/aprobacionanticiposDIFA" element={<AprobacionAnticiposDIFA />} />
+              {/* opcional: cualquier ruta desconocida que te mande al login */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
         </div>
       </ThemeProvider>
     </ColorModelContext.Provider>
-    
   );
 }
 
