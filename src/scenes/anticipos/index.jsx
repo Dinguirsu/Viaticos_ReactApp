@@ -10,10 +10,11 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { dataGridSx } from '../form/datagridStyles';
 import { useNavigate } from 'react-router-dom';
-import { fetchHistorialAnticipos } from '../../login/Services/anticiposService'
-import api from '../../login/Services/api';
+import { fetchHistorialAnticipos } from '../../Services/anticiposService'
+import api from '../../Services/api';
 
 const Dashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -194,6 +195,8 @@ const Dashboard = () => {
             disableSelectionOnClick
             density="comfortable"
             autoHeight={false}
+            sx={dataGridSx}
+            slots={{ toolbar: GridToolbar }}
           />
         </Box>
       </TabPanel>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import api from "../login/Services/api"
+import api from "../Services/api"
 const BASE_URL = "http://localhost:3000/api";
 const USUARIO_ADMIN = "ADMIN";
 const USUARIO_LIQUIDACIONES = "martha.dubon";

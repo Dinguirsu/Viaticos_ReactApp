@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FileUpload from './upload';
 import { Upload } from "@mui/icons-material";
-import {obtenerCodigoLiquidacion} from "../../login/Services/liquidacionesService";
+import {obtenerCodigoLiquidacion} from "../../Services/liquidacionesService";
 
 const today = new Date();
 const month = today.getMonth()+1;
@@ -24,7 +24,16 @@ const Liquidacion = () => {
   const anticipo = location.state?.anticipo || {};
   const [numeroLiquidacion, setNumeroLiq] = useState(""); 
   //const [anticipo, setAnticipo] = useState({});
-
+  const liquidacionPayload = {
+    // Encabezado
+    NumeroAutorizacionAnticipo: anticipo.NumeroAutorizacion ?? null,
+    FechaIngreso: currentDate,                               // "YYYY-MM-DD"
+    CodigoEtapa: "ETP_PEN_LIQ_JEFE",                         
+    SistemaFecha: new Date().toISOString().split("T")[0],    // "YYYY-MM-DD"
+    Monto: Number(anticipo.MontoAnticipo ?? 0),              // <-- cambia por total liquidado real si existe
+    TipoCambio: Number(anticipo.TipoCambio ?? 1),            // <-- de dónde lo obtienes
+    Moneda: String(anticipo.Moneda ?? "1"),                  // "1" HNL / "2" USD según tu sistema
+  };
   useEffect(() => {
     const fetchAnticipos = async () => {
       try { 
@@ -153,9 +162,9 @@ const Liquidacion = () => {
                 sx={{ gridColumn: "span 2" }}
               />
             </Box>
-  
+                
             <br />
-            <FileUpload numeroLiquidacion={numeroLiquidacion?.nextNumeroLiquidacion} />
+            <FileUpload numeroLiquidacion={numeroLiquidacion?.nextNumeroLiquidacion} liquidacionData={liquidacionPayload} />
           </form>
         )}
       </Formik>

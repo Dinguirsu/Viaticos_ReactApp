@@ -12,11 +12,12 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { dataGridSx } from '../form/datagridStyles';
 import {
   fetchHistorialAnticiposByEtapa,
   patchAnticipoAprobado,
-} from "../../login/Services/anticiposService";
+} from "../../Services/anticiposService";
 
 const Dashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -82,7 +83,8 @@ const Dashboard = () => {
       setAprobando(true);
       await patchAnticipoAprobado(
         anticipoSeleccionado.NumeroAutorizacion,
-        comentario
+        comentario, 
+        'ETP_PEN_ANT_ASISTENTE'
       );
 
       // Recargar lista de anticipos pendientes del jefe
@@ -210,6 +212,8 @@ const Dashboard = () => {
             disableSelectionOnClick
             density="comfortable"
             autoHeight={false}
+            sx={dataGridSx}
+            slots={{ toolbar: GridToolbar }}
           />
         </Box>
       </TabPanel>

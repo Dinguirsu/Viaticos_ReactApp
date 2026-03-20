@@ -9,8 +9,13 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
-import {fetchAnticipos, fetchLiquidaciones} from '../../login/Services/anticiposService'
-
+import { fetchAnticipos } from '../../Services/anticiposService'
+import { fetchLiquidaciones } from '../../Services/liquidacionesService'
+import { dataGridSx } from '../form/datagridStyles';
+import {
+  GridToolbarContainer,
+  GridToolbarQuickFilter,
+} from "@mui/x-data-grid";
 
 const Dashboard = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -151,86 +156,127 @@ const Dashboard = () => {
     },
   ];
 
-  return (
-    <Box sx={{ width: "100%", typography: "body1", mt: 2 }}>
-  <Tabs
-    value={tabIndex}
-    onChange={(e, newValue) => setTabIndex(newValue)}
-    centered
-  >
-    <Tab label="Mis Anticipos" />
-    <Tab label="Mis Liquidaciones" />
-  </Tabs>
-
-  <TabPanel value={tabIndex} index={0}>
-    <Typography variant="h4" gutterBottom align="center" sx={{ mt: 3 }}>
-      Mis Anticipos
-    </Typography>
-    <Box
+  const CustomToolbar = () => (
+  <GridToolbarContainer sx={{ p: 1, justifyContent: "flex-end" }}>
+    <GridToolbarQuickFilter
+      placeholder="Buscar..."
+      debounceMs={300}
       sx={{
-        height: 500,
-        width: "100%",
-        mt: 2,
-        "& .MuiDataGrid-root": {
-          borderRadius: 2,
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: "#0b7285",
-          color: "#fff",
-          fontWeight: "bold",
-        },
-        "& .MuiDataGrid-row:hover": {
-          backgroundColor: "rgba(11, 114, 133, 0.08)",
+        width: 260,
+        "& .MuiInputBase-root": {
+          height: 34,
+          fontSize: 13,
+          borderRadius: 1,
+          bgcolor: "rgba(255,255,255,0.06)",
         },
       }}
-    >
+    />
+  </GridToolbarContainer>
+);
+
+
+  return (
+  <Box sx={{ width: "100%", typography: "body1", mt: 2 }}>
+  {/* ✅ Barra de pestañas bien definida */}
+  <Box
+  sx={{
+    mb: 1.5,
+    mx: "auto",
+    maxWidth: 520,
+    p: 0.5,
+    borderRadius: 2,
+    bgcolor: "rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.10)",
+  }}
+>
+  <Tabs
+    value={tabIndex}
+    onChange={(e, v) => setTabIndex(v)}
+    variant="fullWidth"
+    TabIndicatorProps={{ style: { display: "none" } }} // sin indicador (más limpio)
+    sx={{
+      minHeight: 36,
+      "& .MuiTab-root": {
+        minHeight: 36,
+        textTransform: "none",
+        fontWeight: 700,
+        borderRadius: 1.5,
+        px: 2,
+        py: 0.5,
+        color: "rgba(255,255,255,0.75)",
+      },
+      "& .MuiTab-root.Mui-selected": {
+        color: "#fff",
+        bgcolor: "rgba(11,114,133,0.25)",
+      },
+    }}
+  >
+    <Tab label="Anticipos" />
+    <Tab label="Liquidaciones" />
+  </Tabs>
+</Box>
+
+  {/* ---- el resto igual ---- */}
+  <TabPanel value={tabIndex} index={0}>
+    <Typography variant="h6" align="center" sx={{ mt: 0.5, mb: 1 }}>
+      Anticipos Listos Para Liquidar
+    </Typography>
+
+    <Box sx={{ height: 500, width: "100%", mt: 2 }}>
       <DataGrid
-        rows={anticipos
-          ?.filter((row) => row != null)
+        rows={(anticipos || [])
+          .filter((row) => row != null)
           .map((row, idx) => ({ id: idx, ...row }))}
         columns={anticiposColumns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        disableSelectionOnClick
+        sx={dataGridSx}
+        pageSizeOptions={[5, 10, 20]}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 5, page: 0 } },
+        }}
+        disableRowSelectionOnClick
         density="comfortable"
-        autoHeight={false}
+        slots={{ toolbar: CustomToolbar }}
       />
     </Box>
   </TabPanel>
 
   <TabPanel value={tabIndex} index={1}>
-    <Typography variant="h4" gutterBottom align="center" sx={{ mt: 3 }}>
-      Mis Liquidaciones
+    <Typography variant="h6" align="center" sx={{ mt: 0.5, mb: 1 }}>
+      Liquidaciones 
     </Typography>
-    <Box
-      sx={{
-        height: 500,
-        width: "100%",
-        mt: 2,
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: "#364fc7",
-          color: "#fff",
-          fontWeight: "bold",
-        },
-        "& .MuiDataGrid-row:hover": {
-          backgroundColor: "rgba(54, 79, 199, 0.08)",
-        },
-      }}
-    >
+
+    <Box sx={{ height: 420, width: "100%", mt: 2 }}>
       <DataGrid
-        rows={liquidaciones
-          ?.filter((row) => row != null)
+        rows={(liquidaciones || [])
+          .filter((row) => row != null)
           .map((row, idx) => ({ id: idx, ...row }))}
         columns={liquidacionesColumns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
-        disableSelectionOnClick
+        sx={{
+          ...dataGridSx,
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "#364fc7",
+            color: "#fff",
+            fontWeight: "bold",
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: "rgba(54, 79, 199, 0.08)",
+          },
+        }}
+        pageSizeOptions={[5, 10, 20]}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 5, page: 0 } },
+        }}
+        disableRowSelectionOnClick
         density="comfortable"
+        slots={{ toolbar: CustomToolbar }}
       />
     </Box>
   </TabPanel>
 </Box>
-  );
+
+);
+
 };
 
 export default Dashboard;

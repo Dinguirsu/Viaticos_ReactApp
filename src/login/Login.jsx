@@ -2,12 +2,12 @@ import { Grid, CssBaseline, Box, Paper, Typography, TextField, Button, Alert } f
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { tokens } from "../theme";
-import { loginMembership } from "./Services/authService";
+import { loginMembership } from "../Services/authService";
 import { useDispatch } from "react-redux";
 import { setLogin } from "./State/authSlice";
 import { setEmpleado } from "./State/empleadoSlice";
 import { useNavigate } from "react-router-dom";
-import api from "./Services/api";
+import api from "../Services/api";
 
 const Login = () => {
   const theme = useTheme();

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './FileUpload.css'; // Import a CSS file for styling
 import { Button, Box, Typography, Alert } from "@mui/material";
-import { cargarLiquidacion } from '../../login/Services/anticiposService';
+import { cargarLiquidacion } from '../../Services/liquidacionesService';
 
-const FileUpload = ({ numeroLiquidacion }) => {
+const FileUpload = ({ numeroLiquidacion, liquidacionData }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [message, setMessage] = useState('');
 
@@ -35,6 +35,8 @@ const FileUpload = ({ numeroLiquidacion }) => {
             const formData = new FormData();
             formData.append('file', selectedFile);
             formData.append('numeroLiquidacion', numeroLiquidacion);
+            formData.append("liquidacionData", JSON.stringify(liquidacionData));
+
             try {
 
                 const response = await cargarLiquidacion(formData);

@@ -3,11 +3,10 @@ import axios from 'axios';
 import { TextField, Typography, Box } from "@mui/material";
 import Autocomplete from '@mui/material/Autocomplete';
 import { red } from '@mui/material/colors';
-import api from "../../login/Services/api";
+import api from "../../Services/api";
 
 export const NombreEmpleadoComponent = ({onEmpleadoChange}) => {
   const [Empleado, setNombreEmpleado] = useState('');
-  const usuario = 'ADMIN'; // El parámetro que quieres pasar
 
   useEffect(() => {
     const fetchNombreEmpleado = async () => {
@@ -88,32 +87,22 @@ export const TipoEmpleadoComponent = ({onTipoEmpleado}) => {
   );
 };
 
-export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, reset}) => {
+export const SelectContinentes = ({ onCountryChange, onLugar, onMunicipioChange, getMoneda, reset }) => {
   const [continentes, setContinentes] = useState([]);
-  const [selectedPais, setSelectedPais] = useState(null);
-  const [isPaisDisabled, setIsPaisDisabled] = useState(true);
   const [selectedContinente, setSelectedContinente] = useState(null);
-
-  const handleContinenteChange = (event, newValue) => {
-    setSelectedContinente(newValue);
-    if (newValue) {
-      setIsPaisDisabled(false);
-    } else {
-      setIsPaisDisabled(true);
-    }
-  };
+  const [isPaisDisabled, setIsPaisDisabled] = useState(true);
 
   useEffect(() => {
     const fetchContinente = async () => {
       try {
-        const response = await api.get(`/anticipos/continentes`);        
-        setContinentes(response.data);
-
+        const response = await api.get(`/anticipos/continentes`);
+        // Asegura array
+        setContinentes(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
-        console.error('Error fetching the Continent name:', error);
+        console.error("Error fetching the Continent name:", error);
+        setContinentes([]);
       }
     };
-
     fetchContinente();
   }, []);
 
@@ -124,75 +113,76 @@ export const SelectContinentes = ({onCountryChange, onLugar, getMoneda, reset}) 
     }
   }, [reset]);
 
+  const handleContinenteChange = (event, newValue) => {
+    setSelectedContinente(newValue || null);
+    setIsPaisDisabled(!newValue);
+
+    // (Opcional) si querés limpiar lugar/moneda cuando se borra continente:
+    // if (!newValue) {
+    //   onCountryChange?.(null);
+    //   onLugar?.("");
+    // }
+  };
+
   return (
     <div>
       <Autocomplete
+        value={selectedContinente}
         options={continentes}
-        getOptionLabel={(option) => option.NombreContinente}
+        isOptionEqualToValue={(opt, val) => opt?.CodigoContinente === val?.CodigoContinente}
+        getOptionLabel={(option) => option?.NombreContinente ?? ""}
         onChange={handleContinenteChange}
-        renderInput={(params) => 
-        <TextField
-          {...params}  
-          fullWidth   
-          variant="filled"
-          type="text"
-          label="Seleccione un Continente"
-          name="continente"
-          sx={{
-            '& .MuiInputBase-input': {
-              color: 'white', // Cambia este color al que prefieras
-            },
-            '& .MuiFormLabel-root': {
-              color: 'white', // Cambia el color del label cuando no está enfocado
-            },
-            '& .MuiFormLabel-root.Mui-focused': {
-              color: 'white', // Cambia el color del label cuando está enfocado
-            },
-            '& .MuiInput-underline:before': {
-              borderBottomColor: 'white', // Color de la línea antes de enfocarse
-            },
-            '& .MuiInput-underline:hover:before': {
-              borderBottomColor: 'white', // Color de la línea al pasar el cursor
-            },
-            '& .MuiInput-underline:after': {
-              borderBottomColor: 'white', // Color de la línea después de enfocarse
-            },
-          }}
-        />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            fullWidth
+            variant="filled"
+            label="Seleccione un Continente"
+            name="continente"
+          />
+        )}
       />
-      {selectedContinente &&(    
-        <CountrySelector 
-          continente={selectedContinente} 
+
+      {selectedContinente && (
+        <CountrySelector
+          continente={selectedContinente}
           onCountryChange={onCountryChange}
           onLugar={onLugar}
+          onMunicipioChange={onMunicipioChange}   // ✅
           disabled={isPaisDisabled}
           getMoneda={getMoneda}
           reset={reset}
         />
-      )}      
-  </div>
+      )}
+    </div>
   );
 };
 
-export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar, getMoneda, reset}) => {
+export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar, onMunicipioChange, getMoneda, reset }) => {
   const [paises, setPaises] = useState([]);
   const [selectedPais, setSelectedPais] = useState(null);
   const [isDeptoDisabled, setIsDeptoDisabled] = useState(true);
 
   useEffect(() => {
     const fetchPaises = async () => {
-      if (continente) {
-        try {
-          const response = await api.get(`/anticipos/pais/${continente.CodigoContinente}`);
-          setPaises(response.data);
-        } catch (error) {
-          console.error('Error fetching the countries:', error);
-        }
+      if (!continente?.CodigoContinente) {
+        setPaises([]);
+        setSelectedPais(null);
+        setIsDeptoDisabled(true);
+        return;
+      }
+
+      try {
+        const response = await api.get(`/anticipos/pais/${continente.CodigoContinente}`);
+        setPaises(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching the countries:", error);
+        setPaises([]);
       }
     };
 
     fetchPaises();
-  }, []);
+  }, [continente?.CodigoContinente]);
 
   useEffect(() => {
     if (reset) {
@@ -202,64 +192,50 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
   }, [reset]);
 
   const handleChange = (event, newValue) => {
-    setSelectedPais(newValue);
-    onCountryChange(newValue);
-    if (newValue && newValue.CodigoPais === 'HN') {
-      setIsDeptoDisabled(false);
-      getMoneda("1")
-      onLugar(newValue.NombrePais);
-    } else {
+    // si limpian el autocomplete
+    if (!newValue) {
+      setSelectedPais(null);
       setIsDeptoDisabled(true);
-      getMoneda("2");
-      onLugar(newValue.NombrePais);
+      onCountryChange?.(null);
+      onLugar?.("");
+      // (Opcional) moneda por defecto
+      // getMoneda?.("2");
+      return;
     }
+
+    setSelectedPais(newValue);
+    onCountryChange?.(newValue);
+
+    const isHN = newValue.CodigoPais === "HN";
+    setIsDeptoDisabled(!isHN);
+
+    // moneda: 1 = HN, 2 = extranjero (según tu lógica)
+    getMoneda?.(isHN ? "1" : "2");
+    onLugar?.(newValue.NombrePais ?? "");
   };
 
   return (
     <div>
-      <br></br>
+      <br />
       <Autocomplete
-        disabled = {disabled}
+        value={selectedPais}
+        disabled={disabled}
         onChange={handleChange}
         options={paises}
-        getOptionLabel={(option) => option.NombrePais}
-        renderInput={(params) => 
-          <TextField
-              {...params}
-              fullWidth
-              variant="filled"
-              type="text"
-              label="Seleccione un País"
-              name="pais_destino"
-              sx={{
-                '& .MuiInputBase-input': {
-                  color: 'white', // Cambia este color al que prefieras
-                },
-                '& .MuiFormLabel-root': {
-                  color: 'white', // Cambia el color del label cuando no está enfocado
-                },
-                '& .MuiFormLabel-root.Mui-focused': {
-                  color: 'white', // Cambia el color del label cuando está enfocado
-                },
-                '& .MuiInput-underline:before': {
-                  borderBottomColor: 'white', // Color de la línea antes de enfocarse
-                },
-                '& .MuiInput-underline:hover:before': {
-                  borderBottomColor: 'white', // Color de la línea al pasar el cursor
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottomColor: 'white', // Color de la línea después de enfocarse
-                },
-              }}
-          />
-        }
+        isOptionEqualToValue={(opt, val) => opt?.CodigoPais === val?.CodigoPais}
+        getOptionLabel={(option) => option?.NombrePais ?? ""}
+        renderInput={(params) => (
+          <TextField {...params} fullWidth variant="filled" label="Seleccione un País" name="pais_destino" />
+        )}
       />
-      {selectedPais && selectedPais.CodigoPais === 'HN'  && (
-        <Box gridTemplateColumns="repeat(2, minmax(0, 1fr))" sx={{ gridColumn: "span 2"}} >
+
+      {selectedPais?.CodigoPais === "HN" && (
+        <Box gridTemplateColumns="repeat(2, minmax(0, 1fr))" sx={{ gridColumn: "span 2" }}>
           <DeptoSelector
-            disabled={isDeptoDisabled} 
+            disabled={isDeptoDisabled}
             pais={selectedPais}
             onLugar={onLugar}
+            onMunicipioChange={onMunicipioChange}  // ✅
             reset={reset}
           />
         </Box>
@@ -268,24 +244,32 @@ export const CountrySelector = ({ continente, disabled, onCountryChange, onLugar
   );
 };
 
-export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
-  const [departamento, setDepartamento] = useState([]);
-  const [selectdepto, setSelectedDepto] = useState(null);
+export const DeptoSelector = ({ pais, disabled, onLugar, onMunicipioChange, reset }) => {
+  const [departamentos, setDepartamentos] = useState([]);
+  const [selectedDepto, setSelectedDepto] = useState(null);
   const [isMuniDisabled, setIsMuniDisabled] = useState(true);
+
   useEffect(() => {
-    const fetchPaises = async () => {
-      if (pais && pais.CodigoPais === 'HN') {
-        try {
-          const response = await api.get(`/anticipos/departamentos`);
-          setDepartamento(response.data);
-        } catch (error) {
-          console.error('Error fetching the countries:', error);
-        }
+    const fetchDepartamentos = async () => {
+      const isHN = pais?.CodigoPais === "HN";
+      if (!isHN) {
+        setDepartamentos([]);
+        setSelectedDepto(null);
+        setIsMuniDisabled(true);
+        return;
+      }
+
+      try {
+        const response = await api.get(`/anticipos/departamentos`);
+        setDepartamentos(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching departamentos:", error);
+        setDepartamentos([]);
       }
     };
 
-    fetchPaises();
-  }, []);
+    fetchDepartamentos();
+  }, [pais?.CodigoPais]);
 
   useEffect(() => {
     if (reset) {
@@ -295,58 +279,44 @@ export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
   }, [reset]);
 
   const handleChange = (event, newValue) => {
-    setSelectedDepto(newValue);
-    if (newValue) {
-      setIsMuniDisabled(false);
-      onLugar(newValue);
-    } else {
-      setIsMuniDisabled(true);
-    }
-  };
+  // Siempre que cambia depto, limpiar municipio
+  onMunicipioChange?.(null);
+
+  // Si limpiaron la selección:
+  if (!newValue) {
+    setSelectedDepto(null);
+    setIsMuniDisabled(true);
+    onLugar?.(""); // opcional: limpiar texto
+    return;
+  }
+
+  // Selección válida
+  setSelectedDepto(newValue);
+  setIsMuniDisabled(false);
+  onLugar?.(newValue.Nombre ?? "");
+};
+
 
   return (
     <div>
-      <br></br>
+      <br />
       <Autocomplete
-        disabled = {disabled}
+        value={selectedDepto}
+        disabled={disabled}
         onChange={handleChange}
-        options={departamento}
-        getOptionLabel={(option) => option.Nombre}
-        renderInput={(params) =>         
-          <TextField
-              {...params}
-              fullWidth
-              variant="filled"
-              type="text"
-              label="Seleccione un Departamento"
-              name="departamento"
-              sx={{ gridColumn: "span 2",
-                '& .MuiInputBase-input': {
-                  color: 'white', // Cambia este color al que prefieras
-                },
-                '& .MuiFormLabel-root': {
-                  color: 'white', // Cambia el color del label cuando no está enfocado
-                },
-                '& .MuiFormLabel-root.Mui-focused': {
-                  color: 'white', // Cambia el color del label cuando está enfocado
-                },
-                '& .MuiInput-underline:before': {
-                  borderBottomColor: 'white', // Color de la línea antes de enfocarse
-                },
-                '& .MuiInput-underline:hover:before': {
-                  borderBottomColor: 'white', // Color de la línea al pasar el cursor
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottomColor: 'white', // Color de la línea después de enfocarse
-                },
-               }}
-          />
-        }
+        options={departamentos}
+        isOptionEqualToValue={(opt, val) => opt?.IDDept === val?.IDDept}
+        getOptionLabel={(option) => option?.Nombre ?? ""}
+        renderInput={(params) => (
+          <TextField {...params} fullWidth variant="filled" label="Seleccione un Departamento" name="departamento" />
+        )}
       />
-      {selectdepto && (
-        <MuniSelector 
-          depto={selectdepto} 
+
+      {selectedDepto && (
+        <MuniSelector
+          depto={selectedDepto}
           onLugar={onLugar}
+          onMunicipioChange={onMunicipioChange}  // ✅
           reset={reset}
         />
       )}
@@ -354,84 +324,75 @@ export const DeptoSelector = ({ pais, disabled, onLugar, reset}) => {
   );
 };
 
-export const MuniSelector = ({ depto, disabled, onLugar, reset }) => {
-  const [municipio, setMunicipio] = useState([]);
-  const [SelectedMuni, setSelectedMuni] = useState(null);
+export const MuniSelector = ({ depto, onLugar, onMunicipioChange, reset, disabled }) => {
+  const [municipios, setMunicipios] = useState([]);
+  const [selectedMuni, setSelectedMuni] = useState(null);
 
   useEffect(() => {
-    const fetchMunicipio = async () => {
-      if (depto) {
-        try {
-          const response = await api.get(`/anticipos/municipio/${depto.IDDept}`);
-          setMunicipio(response.data);
-        } catch (error) {
-          console.error('Error fetching the countries:', error);
-        }
+    const fetchMunicipios = async () => {
+      if (!depto?.IDDept) {
+        setMunicipios([]);
+        setSelectedMuni(null);
+        return;
       }
-      else{
-        setMunicipio([]);
+
+      try {
+        const response = await api.get(`/anticipos/municipio/${depto.IDDept}`);
+        setMunicipios(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching municipios:", error);
+        setMunicipios([]);
       }
     };
 
-    fetchMunicipio();
-  }, []);
+    fetchMunicipios();
+  }, [depto?.IDDept]);
 
   useEffect(() => {
     if (reset) {
       setSelectedMuni(null);
+      onMunicipioChange?.(null);
+      onLugar?.("");
     }
   }, [reset]);
 
   const handleChange = (event, newValue) => {
-    setSelectedMuni(newValue.Nombre);
-    setSelectedMuni(newValue.Nombre);
-    if (onLugar && newValue) {
-      onLugar(newValue.Nombre);
+    setSelectedMuni(newValue || null);
+
+    if (!newValue) {
+      onMunicipioChange?.(null);
+      onLugar?.("");
+      return;
     }
+
+    onMunicipioChange?.(newValue);         // {IDMunicipio, Nombre}
+    onLugar?.(newValue.Nombre ?? "");
   };
 
   return (
     <div>
-      <br></br>
+      <br />
       <Autocomplete
+        value={selectedMuni}
         onChange={handleChange}
-        disabled = {disabled}
-        options={municipio}
-        getOptionLabel={(option) => option.Nombre}
-        renderInput={(params) =>         
+        disabled={disabled}
+        options={municipios}
+        isOptionEqualToValue={(opt, val) => opt?.IDMunicipio === val?.IDMunicipio}
+        getOptionLabel={(option) => option?.Nombre ?? ""}
+        renderInput={(params) => (
           <TextField
-              {...params}
-              fullWidth
-              variant="filled"
-              type="text"
-              label="Seleccione un Municipio"
-              name="municipio"
-              sx={{ gridColumn: "span 2" ,
-                '& .MuiInputBase-input': {
-                  color: 'white', // Cambia este color al que prefieras
-                },
-                '& .MuiFormLabel-root': {
-                  color: 'white', // Cambia el color del label cuando no está enfocado
-                },
-                '& .MuiFormLabel-root.Mui-focused': {
-                  color: 'white', // Cambia el color del label cuando está enfocado
-                },
-                '& .MuiInput-underline:before': {
-                  borderBottomColor: 'white', // Color de la línea antes de enfocarse
-                },
-                '& .MuiInput-underline:hover:before': {
-                  borderBottomColor: 'white', // Color de la línea al pasar el cursor
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottomColor: 'white', // Color de la línea después de enfocarse
-                },
-              }}
+            {...params}
+            fullWidth
+            variant="filled"
+            label="Seleccione un Municipio"
+            name="municipio"
           />
-        }
+        )}
       />
     </div>
   );
 };
+
 
 export const TransporteComponent = ({onSelectTransport, onSelectRegitro}) => {
   const [Transporte, setTransporte] = useState([]);
@@ -571,7 +532,6 @@ export const GetTotalAnticipos = ({onGetDatos, onGetEstado}) => {
 export const postAnticiposGastoViaje = async (data) => {
   try {
     const response = await api.post('/anticipos/ingresoFormulario', data);
-    console.log("ENTRO PARTE 1");
     return response.data;
   } catch (error) {
     console.error('Error posting anticipos detalle mision:', error);
@@ -582,7 +542,6 @@ export const postAnticiposGastoViaje = async (data) => {
 export const postAnticiposDetalleMision = async (data) => {
   try {
     const response = await api.post('/anticipos/ingresoFormularioDetalle', data);
-    console.log("ENTRO PARTE 2");
     return response.data;
   } catch (error) {
     console.error('Error posting anticipos detalle mision:', error);
@@ -612,32 +571,43 @@ export const TipoCambioComponent = ({getCambio}) => {
 
 export const GetCodigoZonaViaticoHN = async (NombreMunicipio) => {
   try {
-    const response = await api.get(`/anticipos/obtenerCodigoZonaViaticoHN/${NombreMunicipio}`);
-    return response.data[0].CodigoZonaViaticos; // Valor por defecto si es undefined
+    if (!NombreMunicipio || typeof NombreMunicipio !== "string") return null;
+
+    const response = await api.get(`/anticipos/obtenerCodigoZonaViaticoHN/${encodeURIComponent(NombreMunicipio)}`);
+    return response?.data?.[0]?.CodigoZonaViaticos ?? null;
   } catch (error) {
-    console.error('Error fetching Codigo:', error);
+    console.error("Error fetching Codigo:", error);
+    return null;
   }
 };
+
 
 export const GetCodigoZonaViatico = async (NombrePais) => {
   try {
-    const response = await api.get(`/anticipos/obtenerCodigoZonaViatico/${NombrePais}`);
-    return response.data[0].CodigoZona; // Valor por defecto si es undefined
+    if (!NombrePais || typeof NombrePais !== "string") return null;
+
+    const response = await api.get(`/anticipos/obtenerCodigoZonaViatico/${encodeURIComponent(NombrePais)}`);
+    return response?.data?.[0]?.CodigoZona ?? null;
   } catch (error) {
-    console.error('Error fetching Codigo:', error);
+    console.error("Error fetching Codigo:", error);
+    return null;
   }
 };
 
+
 export const GetMontoViaticoLempiras = async (data) => {
   try {
-    const response = await api.get(`/anticipos/obtenerMontoViaticoLempiras`, {
-      params: data
-    });
-    return response.data[0].Monto
+    if (!data || typeof data !== "object") return null;
+
+    console.log(data);
+    const response = await api.get(`/anticipos/obtenerMontoViaticoLempiras`, { params: data });
+    return response?.data?.[0]?.Monto ?? null;
   } catch (error) {
-    console.error('Error fetching divisa:', error);
+    console.error("Error fetching viatico lempiras:", error);
+    return null;
   }
 };
+
 
 export const GetMontoViaticoDolares = async (data) => {
   try {

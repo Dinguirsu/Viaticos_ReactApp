@@ -9,38 +9,40 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { useSelector } from "react-redux";
 
-
-
 const Item = ({ title, to, icon, selected, setSelected }) => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
-    return (
-      <MenuItem
-        active={selected === title}
-        style={{
-          color: colors.grey[100],
-        }}
-        onClick={() => setSelected(title)}
-        icon={icon}
-      >
-        <Typography>{title}</Typography>
-        <Link to={to} />
-      </MenuItem>
-    );
-  };
+  return (
+    <MenuItem
+      active={selected === title}
+      style={{
+        color: colors.grey[100],
+      }}
+      onClick={() => setSelected(title)}
+      icon={icon}
+    >
+      <Typography>{title}</Typography>
+      <Link to={to} />
+    </MenuItem>
+  );
+};
 
 const Sidebar = () => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    const [selected, setSelected] = useState("Dashboard");
-    const user = useSelector((state) => state.auth.user);
-    const tipoEmpleado = user?.tipoEmpleado;
-    const codigoCargo = user?.codigoCargo;
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [selected, setSelected] = useState("Dashboard");
 
-    return (
-        <Box
+  const user = useSelector((state) => state.auth.user);
+
+  // Soportar tanto nombres con mayúscula como minúscula por si el token cambió
+  const tipoCargo = user?.tipoEmpleado;
+  const codigoCargo = user?.codigoCargo;
+
+
+  return (
+    <Box
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
@@ -59,7 +61,7 @@ const Sidebar = () => {
         },
       }}
     >
-        <ProSidebar collapsed={isCollapsed}>
+      <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
@@ -105,7 +107,7 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  
+                  {/* Aquí podrías mostrar user.Nombre si lo tienes */}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   VP Fancy Admin
@@ -115,6 +117,7 @@ const Sidebar = () => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+            {/* Siempre visible */}
             <Item
               title="Dashboard"
               to="/dashboard"
@@ -130,6 +133,8 @@ const Sidebar = () => {
             >
               Pages
             </Typography>
+
+            {/* Realizar anticipo (cualquier empleado) */}
             <Item
               title="Realizar Anticipo"
               to="/form"
@@ -137,6 +142,8 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
+
+            {/* Consultas para usuarios */}
             <Item
               title="Consultas para Usuarios"
               to="/consultas"
@@ -145,17 +152,18 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
-            {(tipoEmpleado === 2 || tipoEmpleado === 3 || tipoEmpleado === 4) && (
-              <Item
-                title="Historial Anticipos"
-                to="/anticipos"
-                icon={<PersonOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
+            {/* Historial y aprobación de anticipos: TipoCargo 2,3,4 */}
+            {(tipoCargo === 2 || tipoCargo === 3 || tipoCargo === 4) && (
+            <Item
+              title="Historial Anticipos"
+              to="/anticipos"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             )}
 
-            {(tipoEmpleado === 2 || tipoEmpleado === 3 || tipoEmpleado === 4) && (
+            {(tipoCargo === 2 || tipoCargo === 3) && (
               <Item
                 title="Aprobacion Anticipos"
                 to="/aprobacionanticipos"
@@ -165,10 +173,50 @@ const Sidebar = () => {
               />
             )}
 
-            {(codigoCargo === 308) && (
+            {(tipoCargo === 2 || tipoCargo === 3) && (
+              <Item
+                title="Aprobacion Liquidacion"
+                to="/aprobacionLiquidacion"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            )}
+
+            {codigoCargo === 308 && (
               <Item
                 title="Aprobacion Anticipos DIFA"
                 to="/aprobacionanticiposDIFA"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            )}
+
+            {codigoCargo === 308 && (
+              <Item
+                title="Reporte Anticipos por Año"
+                to="/historialAnticiposDIFA"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            )}
+
+            {codigoCargo === 307 && (
+              <Item
+                title="Aprobacion Liquidaciones DIFA"
+                to="/aprobacionLiquidacionDIFA"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            )}
+
+            {codigoCargo === 307 && (
+              <Item
+                title="Historial Liquidaciones DIFA"
+                to="/historialLiquidacionDIFA"
                 icon={<PersonOutlinedIcon />}
                 selected={selected}
                 setSelected={setSelected}
@@ -178,7 +226,7 @@ const Sidebar = () => {
         </Menu>
       </ProSidebar>
     </Box>
-    )
-}
+  );
+};
 
 export default Sidebar;

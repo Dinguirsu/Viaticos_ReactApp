@@ -1,6 +1,6 @@
 import axios from "axios";
-import { store } from "../State/store";
-import { setLogout } from "../State/authSlice";
+import { store } from "../login/State/store";
+import { setLogout } from "../login/State/authSlice";
 import { toast } from "react-toastify";
 
 const api = axios.create({
