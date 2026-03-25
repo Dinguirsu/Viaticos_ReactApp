@@ -67,7 +67,7 @@ const Login = () => {
         elevation={6}
         square
         sx={{
-          backgroundImage: "url(/img/banner.webp)",
+          backgroundImage: "url(/img/banner2.webp)",
           backgroundRepeat: "no-repeat",
           backgroundColor: (t) =>
             t.palette.mode === "light" ? t.palette.grey[50] : t.palette.grey[900],
